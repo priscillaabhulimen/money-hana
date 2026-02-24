@@ -1,4 +1,4 @@
-
+'use client'
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { Menu, TrendingUp } from "lucide-react";
