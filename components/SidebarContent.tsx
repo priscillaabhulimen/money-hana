@@ -7,7 +7,6 @@ import {
   Target,
   LogOut,
   X,
-  TrendingUp,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -25,16 +24,12 @@ const NAV_ITEMS = [
 // ── Sidebar content (shared between desktop + mobile) ──────
 export default function SidebarContent({ pathname, onClose }: SidebarProps) {
   return (
-    <div className="flex flex-col h-full bg-[#0f0f1a] text-white">
+    <div className="flex flex-col h-full bg-[#04040a] text-white">
 
       {/* Logo */}
       <div className="flex items-center gap-2 px-6 py-6 border-b border-white/10">
-        <div className="w-8 h-8 rounded-lg bg-linear-to-br from-[#7c3aed] to-[#a855f7] flex items-center justify-center">
-          <TrendingUp size={16} className="text-white" />
-        </div>
-        <span className="text-lg font-semibold tracking-tight">
-          Bux<span className="text-[#a855f7]">aplenty</span>
-        </span>
+        
+        <h1 className="text-5xl font-bebas text-white mb-2"><span className="text-[#1919bc]">MONEY</span>HANA</h1>
         {/* Close button — mobile only */}
         {onClose && (
           <button
