@@ -26,8 +26,9 @@ const schema = z.object({
 type RegisterForm = z.infer<typeof schema>;
 
 export default function RegisterForm() {
-    const { register, handleSubmit, formState: { errors } } = useForm<RegisterForm>({
+    const { register, handleSubmit, formState: { errors, isValid } } = useForm<RegisterForm>({
         resolver: zodResolver(schema),
+        mode: "onChange",
       });
     const [showPassword, setShowPassword] = useState(false);
 
@@ -129,7 +130,7 @@ export default function RegisterForm() {
                 <p className="text-red-500 text-xs mt-1">{errors.confirmPassword.message}</p>
               )}
 
-              <button type="submit" className={buttonStyle(!errors.email && !errors.password)}>
+              <button type="submit" className={buttonStyle(isValid)}>
                 Register
               </button>
 

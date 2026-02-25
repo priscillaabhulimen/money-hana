@@ -20,8 +20,9 @@ const schema = z.object({
 type LoginForm = z.infer<typeof schema>;
 
 export default function LoginPage() {
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>({
+  const { register, handleSubmit, formState: { errors, isValid } } = useForm<LoginForm>({
     resolver: zodResolver(schema),
+    mode: "onChange"
   });
   const [showPassword, setShowPassword] = useState(false);
 
@@ -79,7 +80,7 @@ export default function LoginPage() {
               <Link href="#" className="text-sm text-[#1919bc]">Forgot Password</Link>
             </div>
 
-            <button type="submit" className={buttonStyle(!errors.email && !errors.password)}>
+            <button type="submit" className={buttonStyle(isValid)}>
               Login
             </button>
 
