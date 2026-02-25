@@ -8,6 +8,7 @@ import {
   LogOut,
   X,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface SidebarProps {
   pathname: string,
@@ -23,6 +24,7 @@ const NAV_ITEMS = [
 
 // ── Sidebar content (shared between desktop + mobile) ──────
 export default function SidebarContent({ pathname, onClose }: SidebarProps) {
+  const router = useRouter();
   return (
     <div className="flex flex-col h-full bg-[#04040a] text-white">
 
@@ -93,7 +95,7 @@ export default function SidebarContent({ pathname, onClose }: SidebarProps) {
         <button
           onClick={() => {
             localStorage.removeItem("token");
-            window.location.href = "/login";
+            router.push("/login");
           }}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/50 hover:text-white hover:bg-white/5 transition-all duration-150 group"
         >
