@@ -1,10 +1,10 @@
 import AuthNav from "@/components/AuthNav";
 
-interface AuthLayoutProps {
+interface LandingLayoutProps {
     children: React.ReactNode
 }
 
-export default function AuthLayout({children}: AuthLayoutProps) {
+export default function LandingLayout({children}: LandingLayoutProps) {
     return (
         <AuthNav>
             {children}
