@@ -4,6 +4,8 @@ import { fieldStyle, buttonStyle } from "@/lib/constants";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Eye, EyeOff, Lock } from "lucide-react";
+import { useState } from "react";
 
 const schema = z.object({
   email: z.string()
@@ -19,6 +21,7 @@ export default function LoginPage() {
   const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>({
     resolver: zodResolver(schema),
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   function onSubmit(data: LoginForm) {
     console.log(data);
@@ -39,20 +42,32 @@ export default function LoginPage() {
                 type="text"
                 id="email"
                 placeholder="john@example.com"
-                className={fieldStyle(!!errors.email)}
+                className={fieldStyle(!!errors.email) + 'w-full'}
               />
               {errors.email && (
                 <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
               )}
 
               <label htmlFor="password" className="mt-2 field-label">Password</label>
-              <input
-                {...register("password")}
-                type="password"
-                id="password"
-                placeholder="*********"
-                className={fieldStyle(!!errors.password)}
-              />
+              <div className="relative">
+                <Lock 
+                  size={16} 
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" 
+                />
+                <input
+                  {...register("password")}
+                  type={showPassword ? "text" : "password"}
+                  placeholder="*********"
+                  className={`${fieldStyle(!!errors.password)} pl-9 pr-9 w-full`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
               {errors.password && (
                 <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
               )}
