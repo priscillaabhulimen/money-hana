@@ -46,7 +46,7 @@ export default function AppShell({ children }: AppShellProps) {
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
 
         {/* Mobile top bar */}
-        <header className="lg:hidden flex items-center gap-3 px-4 py-3 border-b border-white/10 bg-[#0f0f1a]">
+        <header className="lg:hidden flex items-center gap-3 px-4 py-3 border-b border-white/10 bg-[#04040a]">
           <button
             onClick={() => setMobileOpen(true)}
             className="p-2 rounded-md text-white/60 hover:text-white hover:bg-white/10 transition-colors"
