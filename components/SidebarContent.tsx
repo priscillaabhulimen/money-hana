@@ -28,9 +28,6 @@ function getInitials(user?: User): string {
   return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
 }
 
-// The sidebar is ALWAYS a dark surface (#04040a) in both light and dark mode.
-// Never use text-background or text-foreground here — those flip with the theme.
-// Always use explicit white/white-opacity values for text on this surface.
 export default function SidebarContent({ pathname, onClose, user }: SidebarProps) {
   const router = useRouter();
 
