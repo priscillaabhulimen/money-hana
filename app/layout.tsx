@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Bebas_Neue, Plus_Jakarta_Sans } from "next/font/google";
+import { ThemeProvider } from 'next-themes'
 
 const bebas = Bebas_Neue({
   weight: "400",
@@ -29,7 +30,9 @@ export default function RootLayout({
       <body
         className={`font-jakarta antialiased`}
       >
-        {children}
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

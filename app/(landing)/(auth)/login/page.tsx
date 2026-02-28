@@ -37,7 +37,7 @@ export default function LoginPage() {
     <div className="flex-1 flex items-center mb-8 lg:mb-0">
       <div className="flex flex-col gap-2 mx-auto max-w-lg px-6 w-full">
         <h1 className="text-2xl font-semibold">Hi there!</h1>
-        <div className="px-8 py-6 bg-white border border-[04040a]/25 rounded-sm">
+        <div className="px-8 py-6 bg-backgound border border-sidebar/10 rounded-sm">
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
 
             <label htmlFor="email" className="field-label">Email</label>
@@ -67,7 +67,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-muted-foreground transition-colors"
               >
                 {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
@@ -77,7 +77,7 @@ export default function LoginPage() {
             )}
 
             <div className="mt-2.5 flex justify-end">
-              <Link href="#" className="text-sm text-[#1919bc]">Forgot Password</Link>
+              <Link href="#" className="text-sm text-primary">Forgot Password</Link>
             </div>
 
             <button
@@ -89,9 +89,9 @@ export default function LoginPage() {
               </button>
 
             <div className="mt-2.5 flex justify-center gap-1">
-              <p className="text-sm py-2 text-gray-600">{"Don't"} have an account?</p>
+              <p className="text-sm py-2 text-muted-foreground">{"Don't"} have an account?</p>
               <Link 
-                className="text-sm text-[#1919bc] font-semibold py-2 cursor-pointer"
+                className="text-sm text-primary font-semibold py-2 cursor-pointer"
                 href={'/register'}
               >Register</Link>
             </div>

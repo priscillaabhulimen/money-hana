@@ -9,29 +9,37 @@ import {
   X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { User } from "@/types";
 
 interface SidebarProps {
-  pathname: string,
-  onClose?: () => void
+  pathname: string;
+  onClose?: () => void;
+  user?: User;
 }
 
-// ── Nav items ──────────────────────────────────────────────
 const NAV_ITEMS = [
   { label: "Dashboard",    href: "/dashboard",    icon: LayoutDashboard },
   { label: "Transactions", href: "/transactions", icon: ArrowLeftRight },
   { label: "Goals",        href: "/goals",        icon: Target },
 ];
 
-// ── Sidebar content (shared between desktop + mobile) ──────
-export default function SidebarContent({ pathname, onClose }: SidebarProps) {
+function getInitials(user?: User): string {
+  if (!user) return "?";
+  return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
+}
+
+export default function SidebarContent({ pathname, onClose, user }: SidebarProps) {
   const router = useRouter();
+
   return (
     <div className="flex flex-col h-full bg-[#04040a] text-white">
 
       {/* Logo */}
-      <div className="flex items-start gap-2 px-6 py-4 border-b border-white/10">
-        <h1 className="text-3xl font-bebas text-white my-3"><span className="text-[#1919bc]">MONEY</span>HANA</h1>
-        {/* Close button — mobile only */}
+      <div className="flex items-center gap-2 px-6 py-4 border-b border-white/10">
+        <h1 className="text-3xl font-bebas text-white my-3">
+          <span className="text-primary">MONEY</span>HANA
+        </h1>
+        {/* Close button — mobile only, only rendered when onClose is provided */}
         {onClose && (
           <button
             onClick={onClose}
@@ -55,7 +63,7 @@ export default function SidebarContent({ pathname, onClose }: SidebarProps) {
                 flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium
                 transition-all duration-150 group
                 ${active
-                  ? "bg-[#7c3aed]/20 text-[#c084fc] border border-[#7c3aed]/40"
+                  ? "bg-primary/20 text-[#6b6bde] border border-primary/40"
                   : "text-white/50 hover:text-white hover:bg-white/5"
                 }
               `}
@@ -64,13 +72,12 @@ export default function SidebarContent({ pathname, onClose }: SidebarProps) {
                 size={18}
                 className={`
                   transition-colors
-                  ${active ? "text-[#a855f7]" : "text-white/40 group-hover:text-white/70"}
+                  ${active ? "text-[#3535d4]" : "text-white/40 group-hover:text-white/70"}
                 `}
               />
               {label}
-              {/* Active indicator dot */}
               {active && (
-                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#a855f7]" />
+                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#3535d4]" />
               )}
             </Link>
           );
@@ -79,18 +86,20 @@ export default function SidebarContent({ pathname, onClose }: SidebarProps) {
 
       {/* User + Logout */}
       <div className="px-3 py-4 border-t border-white/10 space-y-1">
-        {/* User info */}
         <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg">
-          <div className="w-8 h-8 rounded-full bg-linear-to-br from-[#7c3aed] to-[#ec4899] flex items-center justify-center text-xs font-bold shrink-0">
-            PA
+          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-xs font-bold shrink-0">
+            {getInitials(user)}
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-medium text-white truncate">Priscilla A.</p>
-            <p className="text-xs text-white/40 truncate">priscilla@email.com</p>
+            <p className="text-sm font-medium text-white truncate">
+              {user ? `${user.firstName} ${user.lastName}` : "Guest"}
+            </p>
+            <p className="text-xs text-white/40 truncate">
+              {user?.email ?? ""}
+            </p>
           </div>
         </div>
 
-        {/* Logout */}
         <button
           onClick={() => {
             localStorage.removeItem("token");

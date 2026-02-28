@@ -22,8 +22,8 @@ export default function AuthNav({children}: AuthNavProps) {
     const pathname = usePathname();
 
     return <div className="flex flex-col min-h-screen">
-        <nav className="sticky top-0 z-50 bg-white pr-6 flex gap-2 justify-between items-center drop-shadow-[#04040a]/18 drop-shadow-sm">
-            <h1 className="my-2 text-xl font-bebas text-[#04040a] ml-3  px-4"><span className="text-[#1919bc]">MONEY</span>HANA</h1>
+        <nav className="sticky top-0 z-50 bg-background pr-6 flex gap-2 justify-between items-center shadow-sm">
+            <h1 className="my-2 text-xl font-bebas text-foreground ml-3  px-4"><span className="text-primary">MONEY</span>HANA</h1>
             <ul className="flex gap-2 justify-end">
                 {routes.map((route) => 
                     <li 
@@ -31,7 +31,7 @@ export default function AuthNav({children}: AuthNavProps) {
                     >
                         <Link 
                             href={route.href[0]}
-                            className={`text-sm py-3 px-4 rounded-sm font-semibold ${route.href.includes(pathname) ? 'bg-[#04040a] text-white font-bold' : 'text-gray-600'}`}
+                            className={`text-sm py-3 px-4 rounded-sm font-semibold text-muted-foreground ${route.href.includes(pathname) ? 'bg-sidebar-primary font-bold text-foreground' : 'text-muted-foreground'}`}
                         >{route.name}</Link>
                     </li>
                 )}
