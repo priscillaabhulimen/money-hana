@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 
 interface SidebarProps {
   pathname: string,
-  onClose: () => void
+  onClose?: () => void
 }
 
 // ── Nav items ──────────────────────────────────────────────
@@ -29,16 +29,15 @@ export default function SidebarContent({ pathname, onClose }: SidebarProps) {
     <div className="flex flex-col h-full bg-[#04040a] text-white">
 
       {/* Logo */}
-      <div className="flex items-center gap-2 px-6 py-6 border-b border-white/10">
-        
-        <h1 className="text-5xl font-bebas text-white mb-2"><span className="text-[#1919bc]">MONEY</span>HANA</h1>
+      <div className="flex items-start gap-2 px-6 py-4 border-b border-white/10">
+        <h1 className="text-3xl font-bebas text-white my-3"><span className="text-[#1919bc]">MONEY</span>HANA</h1>
         {/* Close button — mobile only */}
         {onClose && (
           <button
             onClick={onClose}
             className="ml-auto p-1 rounded-md hover:bg-white/10 transition-colors lg:hidden"
           >
-            <X size={18} />
+            <X size={22} />
           </button>
         )}
       </div>

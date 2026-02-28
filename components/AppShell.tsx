@@ -1,7 +1,7 @@
 'use client'
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { Menu, TrendingUp } from "lucide-react";
+import { Menu } from "lucide-react";
 import SidebarContent from "./SidebarContent";
 
 interface AppShellProps {
@@ -18,7 +18,7 @@ export default function AppShell({ children }: AppShellProps) {
 
       {/* ── Desktop sidebar (always visible ≥ lg) ── */}
       <aside className="hidden lg:flex flex-col w-60 shrink-0 border-r border-white/10">
-        <SidebarContent pathname={pathname} onClose={function (): void {} } />
+        <SidebarContent pathname={pathname} />
       </aside>
 
       {/* ── Mobile overlay ── */}
@@ -54,12 +54,7 @@ export default function AppShell({ children }: AppShellProps) {
             <Menu size={20} />
           </button>
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-md bg-linear-to-br from-[#7c3aed] to-[#a855f7] flex items-center justify-center">
-              <TrendingUp size={12} className="text-white" />
-            </div>
-            <span className="text-sm font-semibold text-white">
-              Bux<span className="text-[#a855f7]">aplenty</span>
-            </span>
+            <h1 className="text-3xl font-bebas text-white"><span className="text-[#1919bc]">MONEY</span>HANA</h1>
           </div>
         </header>
 

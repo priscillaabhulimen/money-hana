@@ -26,7 +26,7 @@ const schema = z.object({
 type RegisterForm = z.infer<typeof schema>;
 
 export default function RegisterForm() {
-    const { register, handleSubmit, formState: { errors, isValid } } = useForm<RegisterForm>({
+    const { register, handleSubmit, formState: { errors, isValid, isSubmitting } } = useForm<RegisterForm>({
         resolver: zodResolver(schema),
         mode: "onChange",
       });
@@ -40,7 +40,7 @@ export default function RegisterForm() {
     }
 
     return (
-      <div className="flex-1 flex items-center">
+      <div className="flex-1 flex items-center mb-8 lg:mb-0">
         <div className="flex flex-col gap-2 mx-auto max-w-lg px-6 w-full">
           <h1 className="text-2xl font-semibold">Hi there!</h1>
           <div className="px-8 py-6 bg-white border border-[04040a]/25 rounded-sm">
@@ -52,7 +52,7 @@ export default function RegisterForm() {
                 type="text"
                 id="firstName"
                 placeholder="John"
-                className={fieldStyle(!!errors.firstName) + 'w-full'}
+                className={`${fieldStyle(!!errors.firstName)} w-full`}
               />
               {errors.firstName && (
                 <p className="text-red-500 text-xs mt-1">{errors.firstName.message}</p>
@@ -64,7 +64,7 @@ export default function RegisterForm() {
                 type="text"
                 id="lastName"
                 placeholder="Smith"
-                className={fieldStyle(!!errors.lastName) + 'w-full'}
+                className={`${fieldStyle(!!errors.lastName)} w-full`}
               />
               {errors.lastName && (
                 <p className="text-red-500 text-xs mt-1">{errors.lastName.message}</p>
@@ -76,7 +76,7 @@ export default function RegisterForm() {
                 type="text"
                 id="email"
                 placeholder="john@example.com"
-                className={fieldStyle(!!errors.email) + 'w-full'}
+                className={`${fieldStyle(!!errors.email)} w-full`}
               />
               {errors.email && (
                 <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
@@ -114,7 +114,7 @@ export default function RegisterForm() {
                 />
                 <input
                   {...register("confirmPassword")}
-                  type={showPassword ? "text" : "confirmPassword"}
+                  type={showPassword ? "text" : "password"}
                   placeholder="*********"
                   className={`${fieldStyle(!!errors.confirmPassword)} pl-9 pr-9 w-full`}
                 />
@@ -130,14 +130,18 @@ export default function RegisterForm() {
                 <p className="text-red-500 text-xs mt-1">{errors.confirmPassword.message}</p>
               )}
 
-              <button type="submit" className={buttonStyle(isValid)}>
+              <button
+                type="submit"
+                disabled={!isValid || isSubmitting}
+                className={buttonStyle}
+              >
                 Register
               </button>
 
               <div className="mt-2.5 flex gap-1 justify-center">
-                <p className="text-sm py-2">Already have an account?</p>
+                <p className="text-sm py-2 text-gray-600">Already have an account?</p>
                 <Link 
-                  className="text-sm text-[#1919bc] font-medium py-2 cursor-pointer"
+                  className="text-sm text-[#1919bc] font-semibold py-2 cursor-pointer"
                   href={'/login'}
                 >Login</Link>
               </div>

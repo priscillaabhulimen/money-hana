@@ -1,4 +1,5 @@
 'use client';
+import { usePathname } from "next/navigation";
 
 import Link from "next/link";
 
@@ -8,27 +9,29 @@ interface AuthNavProps {
 
 interface AppRoute {
     name: string,
-    href: string
+    href: string[]
 }
 
 const routes: AppRoute[] = [
-    {name: "Features", href: '/features'},
-    {name: "Pricing", href: '/pricing'},
-    {name: "Register", href: "/register"},
+    {name: "Features", href: ['/features']},
+    {name: "Pricing", href: ['/pricing']},
+    {name: "Get Started", href: ['/register', '/login']},
 ]
 
 export default function AuthNav({children}: AuthNavProps) {
+    const pathname = usePathname();
+
     return <div className="flex flex-col min-h-screen">
-        <nav className="py-2 pr-6 flex gap-2 justify-between">
-            <h1 className="text-xl font-bebas text-[#04040a] ml-3  px-4"><span className="text-[#1919bc]">MONEY</span>HANA</h1>
+        <nav className="sticky top-0 z-50 bg-white pr-6 flex gap-2 justify-between items-center drop-shadow-[#04040a]/18 drop-shadow-sm">
+            <h1 className="my-2 text-xl font-bebas text-[#04040a] ml-3  px-4"><span className="text-[#1919bc]">MONEY</span>HANA</h1>
             <ul className="flex gap-2 justify-end">
                 {routes.map((route) => 
                     <li 
                         key={route.name.toLowerCase()} 
                     >
                         <Link 
-                            href={route.href}
-                            className={`text-sm px-4 font-semibold`}
+                            href={route.href[0]}
+                            className={`text-sm py-3 px-4 rounded-sm font-semibold ${route.href.includes(pathname) ? 'bg-[#04040a] text-white font-bold' : 'text-gray-600'}`}
                         >{route.name}</Link>
                     </li>
                 )}

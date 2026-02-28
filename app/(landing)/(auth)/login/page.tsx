@@ -20,7 +20,7 @@ const schema = z.object({
 type LoginForm = z.infer<typeof schema>;
 
 export default function LoginPage() {
-  const { register, handleSubmit, formState: { errors, isValid } } = useForm<LoginForm>({
+  const { register, handleSubmit, formState: { errors, isValid, isSubmitting } } = useForm<LoginForm>({
     resolver: zodResolver(schema),
     mode: "onChange"
   });
@@ -34,7 +34,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex-1 flex items-center">
+    <div className="flex-1 flex items-center mb-8 lg:mb-0">
       <div className="flex flex-col gap-2 mx-auto max-w-lg px-6 w-full">
         <h1 className="text-2xl font-semibold">Hi there!</h1>
         <div className="px-8 py-6 bg-white border border-[04040a]/25 rounded-sm">
@@ -46,7 +46,7 @@ export default function LoginPage() {
               type="text"
               id="email"
               placeholder="john@example.com"
-              className={fieldStyle(!!errors.email) + 'w-full'}
+              className={`${fieldStyle(!!errors.email)} w-full`}
             />
             {errors.email && (
               <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
@@ -80,14 +80,18 @@ export default function LoginPage() {
               <Link href="#" className="text-sm text-[#1919bc]">Forgot Password</Link>
             </div>
 
-            <button type="submit" className={buttonStyle(isValid)}>
-              Login
-            </button>
+            <button
+                type="submit"
+                disabled={!isValid || isSubmitting}
+                className={buttonStyle}
+              >
+                Login
+              </button>
 
             <div className="mt-2.5 flex justify-center gap-1">
-              <p className="text-sm py-2">{"Don't"} have an account?</p>
+              <p className="text-sm py-2 text-gray-600">{"Don't"} have an account?</p>
               <Link 
-                className="text-sm text-[#1919bc] py-2 cursor-pointer"
+                className="text-sm text-[#1919bc] font-semibold py-2 cursor-pointer"
                 href={'/register'}
               >Register</Link>
             </div>
