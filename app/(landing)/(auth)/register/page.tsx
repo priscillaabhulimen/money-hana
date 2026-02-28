@@ -48,7 +48,7 @@ export default function RegisterForm() {
     <div className="flex-1 flex items-center mb-8 lg:mb-0">
       <div className="flex flex-col gap-2 mx-auto max-w-lg px-6 w-full">
         <h1 className="text-2xl font-semibold">Hi there!</h1>
-        <div className="px-8 py-6 bg-backgound border border-sidebar/10 rounded-sm">
+        <div className="px-8 py-6 bg-card border border-border rounded-sm">
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
 
             <label htmlFor="firstName" className="field-label">First name</label>

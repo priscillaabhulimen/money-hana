@@ -28,6 +28,9 @@ function getInitials(user?: User): string {
   return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
 }
 
+// The sidebar is ALWAYS a dark surface (#04040a) in both light and dark mode.
+// Never use text-background or text-foreground here — those flip with the theme.
+// Always use explicit white/white-opacity values for text on this surface.
 export default function SidebarContent({ pathname, onClose, user }: SidebarProps) {
   const router = useRouter();
 
@@ -39,7 +42,6 @@ export default function SidebarContent({ pathname, onClose, user }: SidebarProps
         <h1 className="text-3xl font-bebas text-white my-3">
           <span className="text-primary">MONEY</span>HANA
         </h1>
-        {/* Close button — mobile only, only rendered when onClose is provided */}
         {onClose && (
           <button
             onClick={onClose}
@@ -63,21 +65,18 @@ export default function SidebarContent({ pathname, onClose, user }: SidebarProps
                 flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium
                 transition-all duration-150 group
                 ${active
-                  ? "bg-primary/20 text-[#6b6bde] border border-primary/40"
+                  ? "bg-primary/20 text-primary border border-primary/40"
                   : "text-white/50 hover:text-white hover:bg-white/5"
                 }
               `}
             >
               <Icon
                 size={18}
-                className={`
-                  transition-colors
-                  ${active ? "text-[#3535d4]" : "text-white/40 group-hover:text-white/70"}
-                `}
+                className={`transition-colors ${active ? "text-primary" : "text-white/40 group-hover:text-white/70"}`}
               />
               {label}
               {active && (
-                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#3535d4]" />
+                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-primary" />
               )}
             </Link>
           );
@@ -87,7 +86,7 @@ export default function SidebarContent({ pathname, onClose, user }: SidebarProps
       {/* User + Logout */}
       <div className="px-3 py-4 border-t border-white/10 space-y-1">
         <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg">
-          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-xs font-bold shrink-0">
+          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold shrink-0">
             {getInitials(user)}
           </div>
           <div className="min-w-0">
