@@ -35,7 +35,7 @@ export default function SidebarContent({ pathname, onClose, user }: SidebarProps
   const router = useRouter();
 
   return (
-    <div className="flex flex-col h-full bg-[#04040a] text-white">
+    <div className="flex flex-col h-full bg-sidebar text-white">
 
       {/* Logo */}
       <div className="flex items-center gap-2 px-6 py-4 border-b border-white/10">
@@ -62,10 +62,10 @@ export default function SidebarContent({ pathname, onClose, user }: SidebarProps
               href={href}
               onClick={onClose}
               className={`
-                flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium
+                flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium
                 transition-all duration-150 group
                 ${active
-                  ? "bg-primary/20 text-primary border border-primary/40"
+                  ? "bg-primary/10 text-primary"
                   : "text-white/50 hover:text-white hover:bg-white/5"
                 }
               `}
@@ -75,9 +75,6 @@ export default function SidebarContent({ pathname, onClose, user }: SidebarProps
                 className={`transition-colors ${active ? "text-primary" : "text-white/40 group-hover:text-white/70"}`}
               />
               {label}
-              {active && (
-                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-primary" />
-              )}
             </Link>
           );
         })}

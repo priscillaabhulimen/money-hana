@@ -58,11 +58,11 @@ export default function AppShell({ children }: AppShellProps) {
         <header className="lg:hidden flex items-center gap-3 px-4 py-3 border-b border-white/10 bg-sidebar">
           <button
             onClick={() => setMobileOpen(true)}
-            className="p-2 rounded-md text-background/60 hover:text-background hover:bg-backgound/10 transition-colors"
+            className="p-2 rounded-md text-white/60 hover:text-white hover:bg-white/10 transition-colors"
           >
             <Menu size={20} />
           </button>
-          <h1 className="text-3xl font-bebas text-background">
+          <h1 className="text-3xl font-bebas text-white">
             <span className="text-primary">MONEY</span>HANA
           </h1>
         </header>
