@@ -16,6 +16,8 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarSeparator,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { User } from "@/types";
 
@@ -35,14 +37,12 @@ function getInitials(user?: User): string {
   return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
 }
 
-// This component owns the visual styling — bg-sidebar, text-white etc.
-// SidebarContent/SidebarHeader etc. are layout primitives from shadcn,
-// we override their colours via the CSS token --sidebar in globals.css.
 export default function AppSidebar({ pathname, user }: AppSidebarProps) {
   const router = useRouter();
+  const { setOpenMobile } = useSidebar();
 
   return (
-    <Sidebar >
+    <Sidebar>
 
       {/* Logo */}
       <SidebarHeader className="px-6 py-4 border-b border-white/10">
@@ -60,19 +60,21 @@ export default function AppSidebar({ pathname, user }: AppSidebarProps) {
               <SidebarMenuItem key={href}>
                 <SidebarMenuButton
                   asChild
-                  isActive={active}
                   className={`
                     rounded-md text-sm font-medium transition-all duration-150 py-3
                     ${active
-                      ? "bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary"
+                      ? "bg-white/5 text-white font-bold"
                       : "text-white/50 hover:text-white hover:bg-white/5"
                     }
                   `}
                 >
-                  <Link href={href}>
+                  <Link
+                    href={href}
+                    onClick={() => setOpenMobile(false)}
+                  >
                     <Icon
                       size={18}
-                      className={`transition-colors ${active ? "text-primary" : "text-white/40 group-hover:text-white/70"}`}
+                      className={`transition-colors ${active ? "text-white" : "text-white/40 group-hover:text-white/70"}`}
                     />
                     {label}
                   </Link>
@@ -84,7 +86,8 @@ export default function AppSidebar({ pathname, user }: AppSidebarProps) {
       </SidebarContent>
 
       {/* User + Logout */}
-      <SidebarFooter className="px-3 py-4 border-t border-white/10">
+      <SidebarFooter className="px-3 py-4">
+        <SidebarSeparator className="bg-white/10 mb-2" />
         <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg">
           <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold shrink-0">
             {getInitials(user)}

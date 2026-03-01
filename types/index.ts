@@ -1,5 +1,6 @@
 export type InsightType = "flag" | "pattern" | "goal_warning";
 export type Category = "Dining" | "Groceries" | "Transport" | "Entertainment" | "Income" | "Other";
+export type TransactionType = "income" | "expense";
 
 
 export interface User {
@@ -15,6 +16,7 @@ export interface Transaction {
   user_id: number;
   amount: number;
   category: Category;
+  type: TransactionType;
   note?: string;
   date: string;
   created_at: string;

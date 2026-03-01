@@ -109,13 +109,13 @@
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
   --sidebar: oklch(0.155 0.034 281.7);
-  --sidebar-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-primary: oklch(0.55 0.2 264);
+  --sidebar-foreground: oklch(0.129 0.042 264.695);
+  --sidebar-primary: oklch(0.381 0.234 267.8);
   --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.279 0.041 260.031);
-  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.551 0.027 264.364);
+  --sidebar-accent: oklch(0.968 0.007 247.896);
+  --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
+  --sidebar-border: oklch(0.929 0.013 255.508);
+  --sidebar-ring: oklch(0.704 0.04 256.788);
 }
 
 @layer base {
@@ -123,11 +123,12 @@
   input:-webkit-autofill:hover,
   input:-webkit-autofill:focus,
   input:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 9999px hsl(var(--card)) inset !important;
+    -webkit-box-shadow: 0 0 0 9999px var(--color-card) inset !important;
     -webkit-text-fill-color: var(--foreground) !important;
     caret-color: var(--foreground);
     transition: background-color 9999s ease-in-out 0s;
   }
+
   * {
     @apply border-border outline-ring/50;
   }
@@ -136,9 +137,10 @@
   }
 }
 
-@keyframes bg-drift {
-  from { background-position: 0 0; }
-  to { background-position: 0 400px; }
+[data-slot="sidebar-menu-button"][data-active="true"] {
+  background-color: rgb(255 255 255 / 0.05) !important;
+  color: white !important;
+  font-weight: 700 !important;
 }
 
 .field-label {
