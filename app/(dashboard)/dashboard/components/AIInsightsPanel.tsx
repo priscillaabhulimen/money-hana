@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertTriangle, TrendingUp, Target } from "lucide-react";
+import { AlertTriangle, TrendingUp, Target, ArrowUpRight } from "lucide-react";
 import { AIInsight, InsightType } from "@/types";
+import Link from "next/link";
 
 interface AIInsightsPanelProps {
   insights: AIInsight[];
@@ -43,8 +44,15 @@ export default function AIInsightsPanel({ insights }: AIInsightsPanelProps) {
   return (
     <Card className="flex-1 border-0 shadow-sm bg-card rounded-sm">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-light text-muted-foreground">
-          AI Insights
+        <CardTitle className="flex justify-between">
+          <p className="text-sm font-light text-muted-foreground">Recent Transactions</p>
+          <Link
+            href="/insights"
+            className="text-muted-foreground hover:text-muted-foreground/80 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-sm"
+          >
+            <span className="sr-only">View all insights</span>
+            <ArrowUpRight size={28} className="text-muted-foreground p-1 rounded-sm" />
+          </Link>
         </CardTitle>
       </CardHeader>
       <CardContent>

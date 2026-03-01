@@ -6,6 +6,7 @@ import {
   ArrowLeftRight,
   Target,
   LogOut,
+  Lightbulb,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
@@ -30,6 +31,7 @@ const NAV_ITEMS = [
   { label: "Dashboard",    href: "/dashboard",    icon: LayoutDashboard },
   { label: "Transactions", href: "/transactions", icon: ArrowLeftRight },
   { label: "Goals",        href: "/goals",        icon: Target },
+  { label: "Insights",     href: "/insights",     icon: Lightbulb},
 ];
 
 function getInitials(user?: User): string {
