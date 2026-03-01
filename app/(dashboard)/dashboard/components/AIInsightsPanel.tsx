@@ -45,7 +45,7 @@ export default function AIInsightsPanel({ insights }: AIInsightsPanelProps) {
     <Card className="flex-1 border-0 shadow-sm bg-card rounded-sm">
       <CardHeader className="pb-2">
         <CardTitle className="flex justify-between">
-          <p className="text-sm font-light text-muted-foreground">Recent Transactions</p>
+          <p className="text-sm font-light text-muted-foreground">Recent Insights</p>
           <Link
             href="/insights"
             className="text-muted-foreground hover:text-muted-foreground/80 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-sm"
