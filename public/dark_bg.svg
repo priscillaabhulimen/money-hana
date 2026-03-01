@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1000" viewBox="0 0 1000 1000">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a1a"/>
+      <stop offset="100%" style="stop-color:#060612"/>
+    </linearGradient>
+
+    <!--
+      On mobile: panel is h-60 (~240px) wide strip, bg-cover centers & crops vertically.
+      The square viewBox means the center of the SVG is always visible regardless of crop direction.
+      Lines are distributed across the full 1000x1000 so both a wide crop and a tall crop show activity.
+    -->
+
+    <!-- Fade toward top-right corner so lines soften away from content -->
+    <radialGradient id="lineFade" cx="0%" cy="100%" r="140%">
+      <stop offset="0%"   style="stop-color:white;stop-opacity:1"/>
+      <stop offset="50%"  style="stop-color:white;stop-opacity:0.7"/>
+      <stop offset="100%" style="stop-color:white;stop-opacity:0"/>
+    </radialGradient>
+    <mask id="fadeCorner">
+      <rect width="1000" height="1000" fill="url(#lineFade)"/>
+    </mask>
+  </defs>
+
+  <rect width="1000" height="1000" fill="url(#bg)"/>
+
+  <!-- Grid lines — both horizontal and vertical so grid reads in any crop -->
+  <g stroke="#ffffff" stroke-width="0.5" opacity="0.06">
+    <line x1="0"    y1="200"  x2="1000" y2="200"/>
+    <line x1="0"    y1="400"  x2="1000" y2="400"/>
+    <line x1="0"    y1="600"  x2="1000" y2="600"/>
+    <line x1="0"    y1="800"  x2="1000" y2="800"/>
+    <line x1="200"  y1="0"    x2="200"  y2="1000"/>
+    <line x1="400"  y1="0"    x2="400"  y2="1000"/>
+    <line x1="600"  y1="0"    x2="600"  y2="1000"/>
+    <line x1="800"  y1="0"    x2="800"  y2="1000"/>
+  </g>
+
+  <g mask="url(#fadeCorner)">
+
+    <!-- Line 1 — bold blue, sweeps bottom-left to upper-right -->
+    <polyline fill="none" stroke="#1919bc" stroke-width="2.2" stroke-linejoin="round" opacity="0"
+      points="0,1000 80,940 160,960 260,870 360,850 460,740 560,700 650,580 740,490 840,380 920,290 1000,180">
+      <animate attributeName="opacity" values="0;0.75;0.55;0.75;0" dur="12s" begin="0s" repeatCount="indefinite"/>
+    </polyline>
+
+    <!-- Line 2 — white, offset upward so visible in mobile wide crop too -->
+    <polyline fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round" opacity="0"
+      points="0,700 100,660 200,640 310,590 410,550 510,480 610,420 710,350 810,280 900,210 1000,140">
+      <animate attributeName="opacity" values="0;0.38;0.22;0.38;0" dur="15s" begin="3s" repeatCount="indefinite"/>
+    </polyline>
+
+    <!-- Line 3 — bright blue, full sweep -->
+    <polyline fill="none" stroke="#3a3aee" stroke-width="2.5" stroke-linejoin="round" opacity="0"
+      points="0,900 120,840 240,820 350,750 460,700 560,610 660,530 760,440 860,350 950,260 1000,210">
+      <animate attributeName="opacity" values="0;0.6;0.4;0.6;0" dur="18s" begin="6s" repeatCount="indefinite"/>
+    </polyline>
+
+    <!-- Line 4 — thin white, upper band — critical for mobile horizontal strip -->
+    <polyline fill="none" stroke="#ffffff" stroke-width="1" stroke-linejoin="round" opacity="0"
+      points="0,500 120,460 240,440 360,390 470,350 580,290 680,240 790,190 880,150 1000,100">
+      <animate attributeName="opacity" values="0;0.25;0.14;0.25;0" dur="20s" begin="9s" repeatCount="indefinite"/>
+    </polyline>
+
+    <!-- Line 5 — accent blue -->
+    <polyline fill="none" stroke="#1919bc" stroke-width="1.8" stroke-linejoin="round" opacity="0"
+      points="0,800 140,750 270,720 390,660 500,600 610,520 710,440 810,360 910,270 1000,200">
+      <animate attributeName="opacity" values="0;0.55;0.35;0.55;0" dur="14s" begin="2s" repeatCount="indefinite"/>
+    </polyline>
+
+    <!-- Line 6 — low in frame, only visible on desktop tall view -->
+    <polyline fill="none" stroke="#1919bc" stroke-width="1.5" stroke-linejoin="round" opacity="0"
+      points="0,1000 100,960 230,940 380,880 490,820 590,740 690,660 780,570 870,480 960,390 1000,350">
+      <animate attributeName="opacity" values="0;0.45;0.28;0.45;0" dur="16s" begin="5s" repeatCount="indefinite"/>
+    </polyline>
+
+    <!-- Always-on baselines — one high, one low for coverage in both crops -->
+    <polyline fill="none" stroke="#1919bc" stroke-width="1.5" stroke-linejoin="round" opacity="0.22"
+      points="0,880 120,820 250,800 380,730 500,670 620,580 730,490 840,400 940,310 1000,260"/>
+
+    <polyline fill="none" stroke="#ffffff" stroke-width="0.9" stroke-linejoin="round" opacity="0.12"
+      points="0,600 130,560 260,530 390,470 510,410 630,350 740,285 860,220 1000,160"/>
+
+  </g>
+
+</svg>
