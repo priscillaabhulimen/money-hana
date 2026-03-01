@@ -1,14 +1,14 @@
 'use client';
 
 import { useState, useMemo } from "react";
-import { getTransactions } from "@/services/transactions";
+import { getTransactions, deleteTransaction } from "@/services/transactions";
 import { Transaction, Category } from "@/types";
 import { isWithinInterval, parseISO } from "date-fns";
 import { Plus } from "lucide-react";
 import TransactionFilters from "./components/TransactionFilters";
 import TransactionTable from "./components/TransactionTable";
 import TransactionPagination from "./components/TransactionPagination";
-import AddTransactionModal from "./components/AddTransactionModal";
+import TransactionModal from "./components/TransactionModal";
 import { buttonStyle } from "@/lib/constants";
 
 const ROWS_PER_PAGE = 30;
@@ -35,6 +35,7 @@ export default function TransactionsPage() {
   const [toDate, setToDate] = useState("");
   const [page, setPage] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | undefined>(undefined);
 
   const filtered = useMemo(() => {
     return [...transactions]
@@ -63,14 +64,31 @@ export default function TransactionsPage() {
     setPage(1);
   }
 
+  function handleEdit(transaction: Transaction) {
+    setEditingTransaction(transaction);
+    setModalOpen(true);
+  }
+
+  function handleDelete(id: number) {
+    deleteTransaction(id);
+  }
+
+  function handleModalClose() {
+    setModalOpen(false);
+    setEditingTransaction(undefined);
+  }
+
   return (
     <div className="flex flex-col gap-6 px-8 py-10">
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Transactions</h1>
-        <button onClick={() => setModalOpen(true)} className={`${buttonStyle} flex items-center gap-2 px-3`}>
+        <button
+          onClick={() => setModalOpen(true)}
+          className={`${buttonStyle} flex items-center gap-2 px-3`}
+        >
           <Plus size={16} />
-          Add Transaction
+          <span className="hidden lg:block">Add Transaction</span>
         </button>
       </div>
 
@@ -87,6 +105,8 @@ export default function TransactionsPage() {
       <TransactionTable
         transactions={paginated}
         runningBalances={runningBalances}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
       />
 
       <TransactionPagination
@@ -97,7 +117,12 @@ export default function TransactionsPage() {
         onPageChange={setPage}
       />
 
-      {modalOpen && <AddTransactionModal onClose={() => setModalOpen(false)} />}
+      {modalOpen && (
+        <TransactionModal
+          onClose={handleModalClose}
+          initialData={editingTransaction}
+        />
+      )}
 
     </div>
   );

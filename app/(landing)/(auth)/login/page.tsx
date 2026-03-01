@@ -83,7 +83,7 @@ export default function LoginPage() {
             <button
                 type="submit"
                 disabled={!isValid || isSubmitting}
-                className={buttonStyle}
+                className={`${buttonStyle} mt-10`}
               >
                 Login
               </button>
