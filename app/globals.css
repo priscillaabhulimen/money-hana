@@ -131,6 +131,7 @@
 
   * {
     @apply border-border outline-ring/50;
+    -webkit-tap-highlight-color: transparent;
   }
   body {
     @apply bg-background text-foreground;
@@ -141,6 +142,11 @@
   background-color: rgb(255 255 255 / 0.05) !important;
   color: white !important;
   font-weight: 700 !important;
+}
+
+[data-slot="sidebar-menu-button"][data-active="true"]:hover {
+  background-color: rgb(255 255 255 / 0.05) !important;
+  color: white !important;
 }
 
 .field-label {
