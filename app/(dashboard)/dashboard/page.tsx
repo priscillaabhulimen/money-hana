@@ -32,9 +32,13 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-6 px-8 py-10">
+      {/* Balance */}
+      <BalanceCard balance={balance} income={income} expenses={expenses} />
 
-      {/* Header row */}
-      <div className="flex items-center justify-between">
+      <div className="h-px w-[90%] mx-auto bg-muted mb-3"></div>
+
+      {/* Chart header row */}
+      <div className="flex items-center justify-between ">
         <h1 className="text-2xl font-semibold">Overview</h1>
         <Select value={period} onValueChange={(v) => setPeriod(v as FilterPeriod)}>
           <SelectTrigger className="w-36 text-xs bg-muted border-0 shadow-none focus:ring-0 cursor-pointer">
@@ -48,14 +52,13 @@ export default function DashboardPage() {
         </Select>
       </div>
 
-      {/* Balance */}
-      <BalanceCard balance={balance} income={income} expenses={expenses} />
-
       {/* Charts */}
       <div className="flex flex-col lg:flex-row gap-6">
         <IncomeExpenseChart transactions={transactions} period={period} />
         <SpendingBreakdownChart transactions={transactions} period={period} />
       </div>
+
+      <div className="h-px w-[90%] mx-auto bg-muted mt-8"></div>
 
       {/* Insights and Transactions */}
       <div className="flex flex-col lg:flex-row gap-6">

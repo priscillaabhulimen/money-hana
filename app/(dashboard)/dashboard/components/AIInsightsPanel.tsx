@@ -48,7 +48,7 @@ export default function AIInsightsPanel({ insights }: AIInsightsPanelProps) {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <ul className="flex flex-col gap-3">
+        <ul className="flex flex-col gap-3 max-h-72 overflow-y-auto pr-1">
           {insights.map((insight) => {
             const config = getInsightConfig(insight.type);
             return (
