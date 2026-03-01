@@ -134,7 +134,7 @@ export default function RegisterForm() {
             <button
               type="submit"
               disabled={!isValid || isSubmitting}
-              className={buttonStyle}
+              className={`${buttonStyle} mt-10`}
             >
               Register
             </button>
