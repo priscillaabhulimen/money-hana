@@ -1,5 +1,5 @@
 export const fieldStyle = (hasError?: boolean) =>
-  `focus:outline-none focus:ring-0 focus:border-primary bg-foreground/2.5 py-2 px-2.5 text-sm rounded-sm border placeholder:text-foreground/20 ${
+  `focus:outline-none focus:ring-0 focus:border-primary bg-muted/35 py-2 px-2.5 text-sm rounded-sm border placeholder:text-foreground/20 ${
     hasError ? "border-red-500" : "border-transparent focus:border-primary"
   }`;
 
