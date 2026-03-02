@@ -7,12 +7,15 @@ import { Plus } from "lucide-react";
 import { buttonStyle } from "@/lib/constants";
 import GoalCard from "./components/GoalCard";
 import GoalModal from "./components/GoalModal";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FilterPeriod } from "../dashboard/page";
 
 export default function GoalsPage() {
   const goals: Goal[] = getGoals();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<Goal | undefined>(undefined);
+  const [period, setPeriod] = useState<FilterPeriod>("month");
 
   const existingCategories = goals.map((g) => g.category as Category);
 
@@ -44,6 +47,18 @@ export default function GoalsPage() {
           <span className="hidden lg:block">Add Goal</span>
         </button>
       </div>
+
+      {/* Period dropdown */}
+      <Select value={period} onValueChange={(v) => setPeriod(v as FilterPeriod)}>
+        <SelectTrigger className="w-36 text-xs bg-muted border-0 shadow-none focus:ring-0 cursor-pointer">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="week">This Week</SelectItem>
+          <SelectItem value="month">This Month</SelectItem>
+          <SelectItem value="year">This Year</SelectItem>
+        </SelectContent>
+      </Select>
 
       {/* Goals grid */}
       {goals.length === 0 ? (

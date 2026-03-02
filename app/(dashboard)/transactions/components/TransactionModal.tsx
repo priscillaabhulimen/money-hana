@@ -10,7 +10,7 @@ import { fieldStyle } from "@/lib/constants";
 import { Transaction, Category } from "@/types";
 import { addTransaction, updateTransaction } from "@/services/transactions";
 
-const CATEGORIES = ["Dining", "Groceries", "Transport", "Entertainment", "Income", "Other"] as const;
+const CATEGORIES = ["Dining", "Groceries", "Transport", "Entertainment", "Income", "Other", "Subscriptions"] as const;
 
 const schema = z.object({
   amount: z.number({ invalid_type_error: "Amount is required" }).positive("Amount must be greater than 0"),
@@ -27,6 +27,7 @@ const EXPENSE_CATEGORIES: Category[] = [
   "Groceries",
   "Transport",
   "Entertainment",
+  "Subscriptions",
   "Other",
 ];
 

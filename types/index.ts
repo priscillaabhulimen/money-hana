@@ -1,5 +1,5 @@
 export type InsightType = "flag" | "pattern" | "goal_warning";
-export type Category = "Dining" | "Groceries" | "Transport" | "Entertainment" | "Income" | "Other";
+export type Category = "Dining" | "Groceries" | "Transport" | "Entertainment" | "Income" | "Other" | "Subscriptions";
 export type TransactionType = "income" | "expense";
 
 

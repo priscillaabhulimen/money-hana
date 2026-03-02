@@ -402,6 +402,39 @@ export const transactions: Transaction[] = [
     date: "2026-02-28",
     created_at: "2026-02-28T11:30:00Z",
   },
+
+  {
+    id: 39,
+    user_id: 1,
+    type: "income",
+    amount: 325.75,
+    category: "Income",
+    note: "Side hustle",
+    date: "2026-03-01",
+    created_at: "2026-03-01T06:30:00Z",
+  },
+
+  {
+    id: 40,
+    user_id: 1,
+    type: "income",
+    amount: 200.0,
+    category: "Income",
+    note: "gift from grandma",
+    date: "2026-03-01",
+    created_at: "2026-03-01T09:22:00Z",
+  },
+
+  {
+    id: 41,
+    user_id: 1,
+    type: "expense",
+    amount: 9.07,
+    category: "Entertainment",
+    note: "Cheat day candy",
+    date: "2026-03-01",
+    created_at: "2026-03-01T14:12:00Z",
+  },
 ];
 
 export const goals: Goal[] = [

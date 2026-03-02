@@ -14,6 +14,7 @@ const GOAL_CATEGORIES = [
   "Groceries",
   "Transport",
   "Entertainment",
+  "Subscriptions",
   "Other",
 ] as const;
 
