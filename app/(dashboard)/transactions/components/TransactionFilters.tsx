@@ -12,11 +12,16 @@ import { Category } from "@/types";
 
 const CATEGORIES: Array<Category | "All"> = [
   "All",
-  "Dining",
+  "Salary & Wages",
+  "Returns",
+  "Gift",
   "Groceries",
+  "Dining",
   "Transport",
   "Entertainment",
-  "Income",
+  "Utilities & Bills",
+  "Education",
+  "Subscriptions",
   "Other",
 ];
 

@@ -1,19 +1,28 @@
 export type InsightType = "flag" | "pattern" | "goal_warning";
-export type Category = "Dining" | "Groceries" | "Transport" | "Entertainment" | "Income" | "Other" | "Subscriptions";
 export type TransactionType = "income" | "expense";
 
+export type IncomeCategory = "Salary & Wages" | "Returns" | "Gift" | "Other";
+export type ExpenseCategory =
+  | "Groceries"
+  | "Dining"
+  | "Transport"
+  | "Entertainment"
+  | "Utilities & Bills"
+  | "Education"
+  | "Subscriptions"
+  | "Other";
+export type Category = IncomeCategory | ExpenseCategory;
 
 export interface User {
-    id: string,
-    firstName: string,
-    lastName: string,
-    email: string,
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
 }
 
-
 export interface Transaction {
-  id: number;
-  user_id: number;
+  id: string;
+  user_id: string;
   amount: number;
   category: Category;
   type: TransactionType;
@@ -23,8 +32,8 @@ export interface Transaction {
 }
 
 export interface Goal {
-  id: number;
-  user_id: number;
+  id: string;
+  user_id: string;
   category: Category;
   monthly_limit: number;
   current_spend: number;
@@ -32,7 +41,7 @@ export interface Goal {
 }
 
 export interface AIInsight {
-  id: number;
+  id: string;
   type: InsightType;
   message: string;
   created_at: string;

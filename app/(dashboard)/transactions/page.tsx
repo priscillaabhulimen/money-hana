@@ -13,11 +13,11 @@ import { buttonStyle } from "@/lib/constants";
 
 const ROWS_PER_PAGE = 30;
 
-function computeRunningBalances(transactions: Transaction[]): Map<number, number> {
+function computeRunningBalances(transactions: Transaction[]): Map<string, number> {
   const sorted = [...transactions].sort(
     (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
   );
-  const map = new Map<number, number>();
+  const map = new Map<string, number>();
   let running = 0;
   sorted.forEach((t) => {
     running += t.type === "income" ? t.amount : -t.amount;
@@ -69,7 +69,7 @@ export default function TransactionsPage() {
     setModalOpen(true);
   }
 
-  function handleDelete(id: number) {
+  function handleDelete(id: string) {
     deleteTransaction(id);
   }
 

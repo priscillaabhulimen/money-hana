@@ -12,7 +12,7 @@ import GoalProgressBar from "./GoalProgressBar";
 interface GoalCardProps {
   goal: Goal;
   onEdit: (goal: Goal) => void;
-  onDelete: (id: number) => void;
+  onDelete: (id: string) => void;
 }
 
 function getStatusLabel(percentage: number): { label: string; color: string } {

@@ -9,16 +9,16 @@ export function getTransactions(): Transaction[] {
 
 export function addTransaction(data: Omit<Transaction, "id" | "user_id" | "created_at">): Transaction {
   const newTransaction: Transaction = {
-    ...data,
-    id: transactions.length > 0 ? Math.max(...transactions.map((t) => t.id)) + 1 : 1,
-    user_id: 1,
+    id: (transactions.length + 1).toString(),
+    user_id: "1", // hardcoded for now
     created_at: new Date().toISOString(),
+    ...data,
   };
   transactions.push(newTransaction);
   return newTransaction;
 }
 
-export function deleteTransaction(id: number) {
+export function deleteTransaction(id: string): Transaction | undefined {
   const index = transactions.findIndex((t) => t.id === id);
   if (index === -1) return undefined;
   const deletedTransaction = transactions[index];
@@ -27,7 +27,7 @@ export function deleteTransaction(id: number) {
 }
 
 export function updateTransaction(
-  id: number,
+  id: string,
   data: Partial<Omit<Transaction, "id" | "user_id" | "created_at">>
 ): Transaction | undefined {
   const index = transactions.findIndex((t) => t.id === id);

@@ -24,7 +24,7 @@ export default function GoalsPage() {
     setModalOpen(true);
   }
 
-  function handleDelete(id: number) {
+  function handleDelete(id: string) {
     deleteGoal(id);
   }
 

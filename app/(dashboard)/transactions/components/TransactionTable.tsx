@@ -11,9 +11,9 @@ import {
 
 interface TransactionTableProps {
   transactions: Transaction[];
-  runningBalances: Map<number, number>;
+  runningBalances: Map<string, number>;
   onEdit: (transaction: Transaction) => void;
-  onDelete: (id: number) => void;
+  onDelete: (id: string) => void;
 }
 
 export default function TransactionTable({

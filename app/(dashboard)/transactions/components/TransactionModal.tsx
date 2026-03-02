@@ -10,24 +10,49 @@ import { fieldStyle } from "@/lib/constants";
 import { Transaction, Category } from "@/types";
 import { addTransaction, updateTransaction } from "@/services/transactions";
 
-const CATEGORIES = ["Dining", "Groceries", "Transport", "Entertainment", "Income", "Other", "Subscriptions"] as const;
+const incomeCategoryEnum = z.enum([
+  "Salary & Wages",
+  "Returns",
+  "Gift",
+  "Other",
+]);
+
+const expenseCategoryEnum = z.enum([
+  "Groceries",
+  "Dining",
+  "Transport",
+  "Entertainment",
+  "Utilities & Bills",
+  "Subscriptions",
+  "Education",
+  "Other",
+]);
+
+const categoryEnum = z.enum(
+  [...incomeCategoryEnum.options, ...expenseCategoryEnum.options],
+  { errorMap: () => ({ message: "Category is required" }) }
+);
 
 const schema = z.object({
-  amount: z.number({ invalid_type_error: "Amount is required" }).positive("Amount must be greater than 0"),
+  amount: z
+    .number({ invalid_type_error: "Amount is required" })
+    .positive("Amount must be greater than 0"),
   type: z.enum(["income", "expense"]),
-  category: z.enum(CATEGORIES, { errorMap: () => ({ message: "Category is required" }) }),
+  category: categoryEnum,
   note: z.string().optional(),
   date: z.string().min(1, "Date is required"),
 });
 
 type TransactionForm = z.infer<typeof schema>;
 
+const INCOME_CATEGORIES: Category[] = ["Salary & Wages", "Returns", "Gift", "Other"];
 const EXPENSE_CATEGORIES: Category[] = [
-  "Dining",
   "Groceries",
+  "Dining",
   "Transport",
   "Entertainment",
-  "Subscriptions",
+  "Utilities & Bills",
+  "Education",
   "Other",
 ];
 
@@ -57,6 +82,7 @@ export default function TransactionModal({ onClose, initialData }: TransactionMo
           date: initialData.date,
         }
       : {
+          amount: undefined,
           type: "expense",
           category: undefined,
           note: "",
@@ -68,14 +94,19 @@ export default function TransactionModal({ onClose, initialData }: TransactionMo
   const isDirty = Object.keys(dirtyFields).length > 0;
 
   useEffect(() => {
-  if (type === "income") {
-    setValue("category", "Income", { shouldValidate: true });
-  } else {
-    if (getValues("category") === "Income") {
+    const currentCategory = getValues("category");
+    const incomeOptions: Category[] = ["Salary & Wages", "Returns", "Gift"];
+    const expenseOptions: Category[] = [
+      "Groceries", "Dining", "Transport", "Entertainment",
+      "Utilities & Bills", "Education",
+    ];
+
+    if (type === "income" && expenseOptions.includes(currentCategory)) {
+      setValue("category", undefined as unknown as Category, { shouldValidate: true });
+    } else if (type === "expense" && incomeOptions.includes(currentCategory)) {
       setValue("category", undefined as unknown as Category, { shouldValidate: true });
     }
-  }
-}, [type, setValue, getValues]);
+  }, [type, setValue, getValues]);
 
   function onSubmit(data: TransactionForm) {
     if (isEditing) {
@@ -88,6 +119,7 @@ export default function TransactionModal({ onClose, initialData }: TransactionMo
   }
 
   const canSubmit = isValid && !isSubmitting && (!isEditing || isDirty);
+  const categories = type === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
 
   return (
     <div
@@ -98,7 +130,6 @@ export default function TransactionModal({ onClose, initialData }: TransactionMo
         className="bg-card rounded-sm shadow-lg p-8 w-full max-w-md mx-4 relative"
         onClick={(e) => e.stopPropagation()}
       >
-
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold">
@@ -115,7 +146,7 @@ export default function TransactionModal({ onClose, initialData }: TransactionMo
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
 
-          {/* Type toggle — segmented control */}
+          {/* Type toggle */}
           <div className="flex rounded-sm overflow-hidden border border-border">
             {(["expense", "income"] as const).map((t) => (
               <button
@@ -153,23 +184,15 @@ export default function TransactionModal({ onClose, initialData }: TransactionMo
           {/* Category */}
           <div>
             <label className="field-label">Category</label>
-            {type === "income" ? (
-              <input
-                value="Income"
-                readOnly
-                className={`${fieldStyle(false)} w-full bg-muted text-muted-foreground cursor-not-allowed`}
-              />
-            ) : (
-              <select
-                {...register("category")}
-                className={`${fieldStyle(!!errors.category)} w-full`}
-              >
-                <option value="">Select category</option>
-                {EXPENSE_CATEGORIES.map((c) => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
-              </select>
-            )}
+            <select
+              {...register("category")}
+              className={`${fieldStyle(!!errors.category)} w-full`}
+            >
+              <option value="">Select category</option>
+              {categories.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
             {errors.category && (
               <p className="text-red-500 text-xs mt-1">{errors.category.message}</p>
             )}
@@ -177,7 +200,9 @@ export default function TransactionModal({ onClose, initialData }: TransactionMo
 
           {/* Note */}
           <div>
-            <label className="field-label">Note <span className="text-muted-foreground">(optional)</span></label>
+            <label className="field-label">
+              Note <span className="text-muted-foreground">(optional)</span>
+            </label>
             <input
               {...register("note")}
               placeholder="e.g. Weekly groceries"

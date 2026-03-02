@@ -10,8 +10,8 @@ export function getGoals(): Goal[] {
 export function addGoal(data: Omit<Goal, "id" | "user_id" | "current_spend" | "created_at">): Goal {
   const newGoal: Goal = {
     ...data,
-    id: goals.length > 0 ? Math.max(...goals.map((g) => g.id)) + 1 : 1,
-    user_id: 1,
+    id:  (goals.length + 1).toString(),
+    user_id: "1",
     current_spend: 0,
     created_at: new Date().toISOString(),
   };
@@ -20,7 +20,7 @@ export function addGoal(data: Omit<Goal, "id" | "user_id" | "current_spend" | "c
 }
 
 export function updateGoal(
-  id: number,
+  id: string,
   data: Partial<Omit<Goal, "id" | "user_id" | "current_spend" | "created_at">>
 ): Goal | undefined {
   const index = goals.findIndex((g) => g.id === id);
@@ -29,7 +29,7 @@ export function updateGoal(
   return goals[index];
 }
 
-export function deleteGoal(id: number): void {
+export function deleteGoal(id: string): void {
   const index = goals.findIndex((g) => g.id === id);
   if (index !== -1) goals.splice(index, 1);
 }
