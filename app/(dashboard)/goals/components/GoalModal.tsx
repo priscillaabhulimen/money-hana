@@ -6,22 +6,23 @@ import { z } from "zod";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { fieldStyle } from "@/lib/constants";
-import { Goal, Category } from "@/types";
-import { addGoal, updateGoal } from "@/services/goals";
+import { Goal, ExpenseCategory } from "@/types";
+import { useAddGoal, useUpdateGoal } from "@/hooks/useGoals";
 
-const GOAL_CATEGORIES = [
-  "Dining",
-  "Groceries",
-  "Transport",
-  "Entertainment",
-  "Subscriptions",
-  "Other",
-] as const;
+// API values match backend enums
+const GOAL_CATEGORIES: { value: ExpenseCategory; label: string }[] = [
+  { value: "groceries", label: "Groceries" },
+  { value: "dining", label: "Dining" },
+  { value: "transport", label: "Transport" },
+  { value: "entertainment", label: "Entertainment" },
+  { value: "utilities_bills", label: "Utilities & Bills" },
+  { value: "education", label: "Education" },
+  { value: "subscriptions", label: "Subscriptions" },
+  { value: "other", label: "Other" },
+];
 
 const schema = z.object({
-  category: z.enum(GOAL_CATEGORIES, {
-    errorMap: () => ({ message: "Category is required" }),
-  }),
+  category: z.string().min(1, "Category is required"),
   monthly_limit: z
     .number({ invalid_type_error: "Monthly limit is required" })
     .positive("Monthly limit must be greater than 0"),
@@ -32,14 +33,16 @@ type GoalForm = z.infer<typeof schema>;
 interface GoalModalProps {
   onClose: () => void;
   initialData?: Goal;
-  existingCategories?: Category[];
+  existingCategories?: ExpenseCategory[];
 }
 
 export default function GoalModal({ onClose, initialData, existingCategories = [] }: GoalModalProps) {
   const isEditing = !!initialData;
+  const addGoal = useAddGoal();
+  const updateGoal = useUpdateGoal();
 
   const availableCategories = GOAL_CATEGORIES.filter(
-    (c) => !existingCategories.includes(c) || c === initialData?.category
+    (c) => !existingCategories.includes(c.value) || c.value === initialData?.category
   );
 
   const {
@@ -51,7 +54,7 @@ export default function GoalModal({ onClose, initialData, existingCategories = [
     mode: "onChange",
     defaultValues: isEditing
       ? {
-          category: initialData.category as typeof GOAL_CATEGORIES[number],
+          category: initialData.category,
           monthly_limit: initialData.monthly_limit,
         }
       : undefined,
@@ -59,14 +62,26 @@ export default function GoalModal({ onClose, initialData, existingCategories = [
 
   const isDirty = Object.keys(dirtyFields).length > 0;
   const canSubmit = isValid && !isSubmitting && (!isEditing || isDirty);
+  const isPending = addGoal.isPending || updateGoal.isPending;
+  const mutationError = addGoal.error || updateGoal.error;
 
-  function onSubmit(data: GoalForm) {
-    if (isEditing) {
-      updateGoal(initialData.id, data);
-    } else {
-      addGoal(data);
+  async function onSubmit(data: GoalForm) {
+    try {
+      if (isEditing) {
+        await updateGoal.mutateAsync({
+          id: initialData.id,
+          data: { monthly_limit: data.monthly_limit },
+        });
+      } else {
+        await addGoal.mutateAsync({
+          category: data.category,
+          monthly_limit: data.monthly_limit,
+        });
+      }
+      onClose();
+    } catch (error) {
+      console.error(error);
     }
-    onClose();
   }
 
   return (
@@ -105,7 +120,7 @@ export default function GoalModal({ onClose, initialData, existingCategories = [
             >
               <option value="">Select category</option>
               {availableCategories.map((c) => (
-                <option key={c} value={c}>{c}</option>
+                <option key={c.value} value={c.value}>{c.label}</option>
               ))}
             </select>
             {isEditing && (
@@ -133,8 +148,12 @@ export default function GoalModal({ onClose, initialData, existingCategories = [
             )}
           </div>
 
-          <Button type="submit" disabled={!canSubmit} className="w-full mt-2">
-            {isEditing ? "Update Goal" : "Add Goal"}
+          {mutationError && (
+            <p className="text-red-500 text-xs">{mutationError.message}</p>
+          )}
+
+          <Button type="submit" disabled={!canSubmit || isPending} className="w-full mt-2">
+            {isPending ? "Saving..." : isEditing ? "Update Goal" : "Add Goal"}
           </Button>
 
         </form>

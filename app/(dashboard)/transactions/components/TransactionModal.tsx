@@ -1,59 +1,61 @@
 'use client';
 
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { fieldStyle } from "@/lib/constants";
-import { Transaction, Category } from "@/types";
-import { addTransaction, updateTransaction } from "@/services/transactions";
+import { Transaction } from "@/types";
+import { useAddTransaction, useUpdateTransaction } from "@/hooks/useTransactions";
 
+// API values (lowercase with underscores)
 const incomeCategoryEnum = z.enum([
-  "Salary & Wages",
-  "Returns",
-  "Gift",
-  "Other",
+  "salary_wages",
+  "returns",
+  "gift",
+  "other",
 ]);
 
 const expenseCategoryEnum = z.enum([
-  "Groceries",
-  "Dining",
-  "Transport",
-  "Entertainment",
-  "Utilities & Bills",
-  "Subscriptions",
-  "Education",
-  "Other",
+  "groceries",
+  "dining",
+  "transport",
+  "entertainment",
+  "utilities_bills",
+  "education",
+  "subscriptions",
+  "other",
 ]);
-
-const categoryEnum = z.enum(
-  [...incomeCategoryEnum.options, ...expenseCategoryEnum.options],
-  { errorMap: () => ({ message: "Category is required" }) }
-);
 
 const schema = z.object({
   amount: z
     .number({ invalid_type_error: "Amount is required" })
     .positive("Amount must be greater than 0"),
-  type: z.enum(["income", "expense"]),
-  category: categoryEnum,
+  transaction_type: z.enum(["income", "expense"]),
+  category: z.string().min(1, "Category is required"),
   note: z.string().optional(),
   date: z.string().min(1, "Date is required"),
 });
 
 type TransactionForm = z.infer<typeof schema>;
 
-const INCOME_CATEGORIES: Category[] = ["Salary & Wages", "Returns", "Gift", "Other"];
-const EXPENSE_CATEGORIES: Category[] = [
-  "Groceries",
-  "Dining",
-  "Transport",
-  "Entertainment",
-  "Utilities & Bills",
-  "Education",
-  "Other",
+const INCOME_CATEGORIES = [
+  { value: "salary_wages", label: "Salary & Wages" },
+  { value: "returns", label: "Returns" },
+  { value: "gift", label: "Gift" },
+  { value: "other", label: "Other" },
+];
+
+const EXPENSE_CATEGORIES = [
+  { value: "groceries", label: "Groceries" },
+  { value: "dining", label: "Dining" },
+  { value: "transport", label: "Transport" },
+  { value: "entertainment", label: "Entertainment" },
+  { value: "utilities_bills", label: "Utilities & Bills" },
+  { value: "education", label: "Education" },
+  { value: "other", label: "Other" },
 ];
 
 interface TransactionModalProps {
@@ -63,10 +65,13 @@ interface TransactionModalProps {
 
 export default function TransactionModal({ onClose, initialData }: TransactionModalProps) {
   const isEditing = !!initialData;
+  const addTransaction = useAddTransaction();
+  const updateTransaction = useUpdateTransaction();
 
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isValid, isSubmitting, dirtyFields },
     setValue,
     getValues,
@@ -76,50 +81,68 @@ export default function TransactionModal({ onClose, initialData }: TransactionMo
     defaultValues: isEditing
       ? {
           amount: initialData.amount,
-          type: initialData.type,
+          transaction_type: initialData.transaction_type,
           category: initialData.category,
           note: initialData.note ?? "",
           date: initialData.date,
         }
       : {
           amount: undefined,
-          type: "expense",
+          transaction_type: "expense",
           category: undefined,
           note: "",
           date: new Date().toISOString().slice(0, 10),
         },
   });
 
-  const type = getValues("type");
+  const transaction_type = useWatch({ control, name: "transaction_type" });
   const isDirty = Object.keys(dirtyFields).length > 0;
 
   useEffect(() => {
     const currentCategory = getValues("category");
-    const incomeOptions: Category[] = ["Salary & Wages", "Returns", "Gift"];
-    const expenseOptions: Category[] = [
-      "Groceries", "Dining", "Transport", "Entertainment",
-      "Utilities & Bills", "Education",
-    ];
+    const incomeValues = incomeCategoryEnum.options as string[];
+    const expenseValues = expenseCategoryEnum.options as string[];
 
-    if (type === "income" && expenseOptions.includes(currentCategory)) {
-      setValue("category", undefined as unknown as Category, { shouldValidate: true });
-    } else if (type === "expense" && incomeOptions.includes(currentCategory)) {
-      setValue("category", undefined as unknown as Category, { shouldValidate: true });
+    if (transaction_type === "income" && expenseValues.includes(currentCategory)) {
+      setValue("category", "", { shouldValidate: true });
+    } else if (transaction_type === "expense" && incomeValues.includes(currentCategory)) {
+      setValue("category", "", { shouldValidate: true });
     }
-  }, [type, setValue, getValues]);
+  }, [transaction_type, setValue, getValues]);
 
-  function onSubmit(data: TransactionForm) {
-    if (isEditing) {
-      const { amount, type, category, note, date } = data;
-      updateTransaction(initialData.id, { amount, type, category, note, date });
-    } else {
-      addTransaction(data);
+  async function onSubmit(data: TransactionForm) {
+    try {
+      if (isEditing) {
+        await updateTransaction.mutateAsync({
+          id: initialData.id,
+          data: {
+            amount: data.amount,
+            transaction_type: data.transaction_type,
+            category: data.category,
+            note: data.note,
+            date: data.date,
+          },
+        });
+      } else {
+        await addTransaction.mutateAsync({
+          transaction_type: data.transaction_type,
+          category: data.category,
+          amount: data.amount,
+          date: data.date,
+          note: data.note,
+        });
+      }
+      onClose();
+    } catch (error) {
+      // Error is surfaced via mutation state if needed
+      console.error(error);
     }
-    onClose();
   }
 
   const canSubmit = isValid && !isSubmitting && (!isEditing || isDirty);
-  const categories = type === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
+  const categories = transaction_type === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
+  const isPending = addTransaction.isPending || updateTransaction.isPending;
+  const mutationError = addTransaction.error || updateTransaction.error;
 
   return (
     <div
@@ -152,9 +175,9 @@ export default function TransactionModal({ onClose, initialData }: TransactionMo
               <button
                 key={t}
                 type="button"
-                onClick={() => setValue("type", t, { shouldDirty: true, shouldValidate: true })}
+                onClick={() => setValue("transaction_type", t, { shouldDirty: true, shouldValidate: true })}
                 className={`flex-1 py-2 text-sm font-medium transition-colors capitalize ${
-                  type === t
+                  transaction_type === t
                     ? "bg-primary text-primary-foreground"
                     : "bg-card text-muted-foreground hover:text-foreground"
                 }`}
@@ -190,7 +213,7 @@ export default function TransactionModal({ onClose, initialData }: TransactionMo
             >
               <option value="">Select category</option>
               {categories.map((c) => (
-                <option key={c} value={c}>{c}</option>
+                <option key={c.value} value={c.value}>{c.label}</option>
               ))}
             </select>
             {errors.category && (
@@ -223,8 +246,12 @@ export default function TransactionModal({ onClose, initialData }: TransactionMo
             )}
           </div>
 
-          <Button type="submit" disabled={!canSubmit} className="w-full mt-2">
-            {isEditing ? "Update Transaction" : "Add Transaction"}
+          {mutationError && (
+            <p className="text-red-500 text-xs">{mutationError.message}</p>
+          )}
+
+          <Button type="submit" disabled={!canSubmit || isPending} className="w-full mt-2">
+            {isPending ? "Saving..." : isEditing ? "Update Transaction" : "Add Transaction"}
           </Button>
 
         </form>

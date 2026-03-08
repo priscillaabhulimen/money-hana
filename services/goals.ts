@@ -1,35 +1,54 @@
-// TODO Week 3: replace with fetch() call to FastAPI
+import { Goal, ApiResponse } from "@/types";
 
-import { goals } from './mockdata';
-import { Goal } from "../types";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
 
-export function getGoals(): Goal[] {
-  return goals;
+async function handleResponse<T>(response: Response): Promise<T> {
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: "An error occurred" }));
+    throw new Error(error.message || "An error occurred");
+  }
+  return response.json();
 }
 
-export function addGoal(data: Omit<Goal, "id" | "user_id" | "current_spend" | "created_at">): Goal {
-  const newGoal: Goal = {
-    ...data,
-    id:  (goals.length + 1).toString(),
-    user_id: "1",
-    current_spend: 0,
-    created_at: new Date().toISOString(),
-  };
-  goals.push(newGoal);
-  return newGoal;
+export async function getGoals() {
+  const response = await fetch(`${API_URL}/goals`, { cache: "no-store" });
+  return handleResponse<ApiResponse<Goal[]>>(response);
 }
 
-export function updateGoal(
-  id: string,
-  data: Partial<Omit<Goal, "id" | "user_id" | "current_spend" | "created_at">>
-): Goal | undefined {
-  const index = goals.findIndex((g) => g.id === id);
-  if (index === -1) return undefined;
-  goals[index] = { ...goals[index], ...data };
-  return goals[index];
+export async function getGoal(id: string) {
+  const response = await fetch(`${API_URL}/goals/${id}`, { cache: "no-store" });
+  return handleResponse<ApiResponse<Goal>>(response);
 }
 
-export function deleteGoal(id: string): void {
-  const index = goals.findIndex((g) => g.id === id);
-  if (index !== -1) goals.splice(index, 1);
+export type GoalPayload = {
+  category: string;
+  monthly_limit: number;
+};
+
+export async function addGoal(data: GoalPayload) {
+  const response = await fetch(`${API_URL}/goals`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return handleResponse<ApiResponse<Goal>>(response);
+}
+
+export async function updateGoal(id: string, data: Pick<GoalPayload, "monthly_limit">) {
+  const response = await fetch(`${API_URL}/goals/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return handleResponse<ApiResponse<Goal>>(response);
+}
+
+export async function deleteGoal(id: string) {
+  const response = await fetch(`${API_URL}/goals/${id}`, {
+    method: "DELETE",
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: "An error occurred" }));
+    throw new Error(error.message || "An error occurred");
+  }
 }

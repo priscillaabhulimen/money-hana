@@ -51,7 +51,7 @@ function groupByWeek(transactions: Transaction[]): ChartEntry[] {
   filtered.forEach((t) => {
     const week = `Week ${getWeekNumber(new Date(t.date))}`;
     if (!weeks[week]) return;
-    if (t.type === "income") weeks[week].income += t.amount;
+    if (t.transaction_type === "income") weeks[week].income += t.amount;
     else weeks[week].expenses += t.amount;
   });
   return Object.entries(weeks).map(([label, v]) => ({
@@ -76,7 +76,7 @@ function groupByDay(transactions: Transaction[]): ChartEntry[] {
     const d = new Date(t.date);
     if (d < startOfWeek || d > endOfWeek) return;
     const day = days[d.getDay()];
-    if (t.type === "income") buckets[day].income += t.amount;
+    if (t.transaction_type === "income") buckets[day].income += t.amount;
     else buckets[day].expenses += t.amount;
   });
   return days.map((day) => ({
@@ -96,7 +96,7 @@ function groupByMonth(transactions: Transaction[]): ChartEntry[] {
   months.forEach((m) => (buckets[m] = { income: 0, expenses: 0 }));
   filtered.forEach((t) => {
     const month = months[new Date(t.date).getMonth()];
-    if (t.type === "income") buckets[month].income += t.amount;
+    if (t.transaction_type === "income") buckets[month].income += t.amount;
     else buckets[month].expenses += t.amount;
   });
   return months.map((month) => ({

@@ -1,35 +1,18 @@
 'use client';
 
 import { useState, useMemo } from "react";
-import { getTransactions, deleteTransaction } from "@/services/transactions";
 import { Transaction, Category } from "@/types";
-import { isWithinInterval, parseISO } from "date-fns";
 import { Plus } from "lucide-react";
 import TransactionFilters from "./components/TransactionFilters";
 import TransactionTable from "./components/TransactionTable";
 import TransactionPagination from "./components/TransactionPagination";
 import TransactionModal from "./components/TransactionModal";
+import TransactionTableSkeleton from "@/components/skeletons/transaction-table";
 import { buttonStyle } from "@/lib/constants";
-
-const ROWS_PER_PAGE = 30;
-
-function computeRunningBalances(transactions: Transaction[]): Map<string, number> {
-  const sorted = [...transactions].sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-  );
-  const map = new Map<string, number>();
-  let running = 0;
-  sorted.forEach((t) => {
-    running += t.type === "income" ? t.amount : -t.amount;
-    map.set(t.id, running);
-  });
-  return map;
-}
+import { useTransactions, useDeleteTransaction } from "@/hooks/useTransactions";
+import { ROWS_PER_PAGE } from "@/services/transactions";
 
 export default function TransactionsPage() {
-  const transactions: Transaction[] = getTransactions();
-  const runningBalances = useMemo(() => computeRunningBalances(transactions), [transactions]);
-
   const [category, setCategory] = useState<Category | "All">("All");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
@@ -37,25 +20,23 @@ export default function TransactionsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | undefined>(undefined);
 
-  const filtered = useMemo(() => {
-    return [...transactions]
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-      .filter((t) => {
-        if (category !== "All" && t.category !== category) return false;
-        if (fromDate && toDate) {
-          return isWithinInterval(parseISO(t.date), {
-            start: parseISO(fromDate),
-            end: parseISO(toDate),
-          });
-        }
-        if (fromDate && parseISO(t.date) < parseISO(fromDate)) return false;
-        if (toDate && parseISO(t.date) > parseISO(toDate)) return false;
-        return true;
-      });
-  }, [transactions, category, fromDate, toDate]);
+  const { data, isLoading, isError } = useTransactions(
+    page,
+    fromDate || undefined,
+    toDate || undefined,
+  );
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / ROWS_PER_PAGE));
-  const paginated = filtered.slice((page - 1) * ROWS_PER_PAGE, page * ROWS_PER_PAGE);
+  const deleteTransaction = useDeleteTransaction();
+
+  // Client-side category filter (category filter is UI-only, not sent to API)
+  const transactions = useMemo(() => data?.data ?? [], [data]);
+  const filtered = useMemo(() => {
+    if (category === "All") return transactions;
+    return transactions.filter((t) => t.category === category);
+  }, [transactions, category]);
+
+  const total = category === "All" ? (data?.total ?? 0) : filtered.length;
+  const totalPages = Math.max(1, Math.ceil(total / ROWS_PER_PAGE));
 
   function handleClear() {
     setCategory("All");
@@ -70,7 +51,7 @@ export default function TransactionsPage() {
   }
 
   function handleDelete(id: string) {
-    deleteTransaction(id);
+    deleteTransaction.mutate(id);
   }
 
   function handleModalClose() {
@@ -102,17 +83,24 @@ export default function TransactionsPage() {
         onClear={handleClear}
       />
 
-      <TransactionTable
-        transactions={paginated}
-        runningBalances={runningBalances}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
+      {isError && (
+        <p className="text-sm text-red-500">Failed to load transactions. Please try again.</p>
+      )}
+
+      {isLoading ? (
+        <TransactionTableSkeleton />
+      ) : (
+        <TransactionTable
+          transactions={filtered}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
+      )}
 
       <TransactionPagination
         page={page}
         totalPages={totalPages}
-        totalItems={filtered.length}
+        totalItems={total}
         rowsPerPage={ROWS_PER_PAGE}
         onPageChange={setPage}
       />

@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowDownLeft, ArrowUpRight } from "lucide-react";
-import { Transaction } from "@/types";
-import { format } from "date-fns";
+import { Transaction, getCategoryLabel } from "@/types";
+import { format, parseISO } from "date-fns";
 import Link from "next/link";
 
 interface RecentTransactionsProps {
@@ -34,11 +34,11 @@ export default function RecentTransactions({ transactions }: RecentTransactionsP
 
               {/* Icon */}
               <div className={`p-2 rounded-full shrink-0 ${
-                t.type === "income"
+                t.transaction_type === "income"
                   ? "bg-green-500/10"
                   : "bg-red-500/10"
               }`}>
-                {t.type === "income"
+                {t.transaction_type === "income"
                   ? <ArrowDownLeft size={14} className="text-green-500" />
                   : <ArrowUpRight size={14} className="text-red-500/85" />
                 }
@@ -46,19 +46,19 @@ export default function RecentTransactions({ transactions }: RecentTransactionsP
 
               {/* Note + category */}
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{t.note ?? t.category}</p>
-                <p className="text-xs text-muted-foreground">{t.category}</p>
+                <p className="text-sm font-medium truncate">{t.note ?? getCategoryLabel(t.category)}</p>
+                <p className="text-xs text-muted-foreground">{getCategoryLabel(t.category)}</p>
               </div>
 
               {/* Amount + date */}
               <div className="text-right shrink-0">
                 <p className={`text-sm font-semibold ${
-                  t.type === "income" ? "text-green-500" : "text-red-500/85"
+                  t.transaction_type === "income" ? "text-green-500" : "text-red-500/85"
                 }`}>
-                  {t.type === "income" ? "+" : "-"}${t.amount.toFixed(2)}
+                  {t.transaction_type === "income" ? "+" : "-"}${t.amount.toFixed(2)}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {format(new Date(t.date), "MMM d")}
+                  {format(parseISO(t.date), "MMM d")}
                 </p>
               </div>
 
