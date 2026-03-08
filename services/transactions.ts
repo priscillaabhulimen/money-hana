@@ -1,37 +1,71 @@
-// TODO Week 3: replace with fetch() call to FastAPI
+import { Transaction, ApiResponse, PaginatedResponse } from "@/types";
 
-import { transactions } from './mockdata';
-import { Transaction } from "../types";
+const ROWS_PER_PAGE = 30;
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
 
-export function getTransactions(): Transaction[] {
-  return transactions;
+async function handleResponse<T>(response: Response): Promise<T> {
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: "An error occurred" }));
+    throw new Error(error.message || "An error occurred");
+  }
+  return response.json();
 }
 
-export function addTransaction(data: Omit<Transaction, "id" | "user_id" | "created_at">): Transaction {
-  const newTransaction: Transaction = {
-    id: (transactions.length + 1).toString(),
-    user_id: "1", // hardcoded for now
-    created_at: new Date().toISOString(),
-    ...data,
-  };
-  transactions.push(newTransaction);
-  return newTransaction;
+export async function getTransactions(page: number, startDate?: string, endDate?: string) {
+  const params = new URLSearchParams({
+    limit: String(ROWS_PER_PAGE),
+    page: String(page),
+  });
+  if (startDate) params.append("start_date", startDate);
+  if (endDate) params.append("end_date", endDate);
+
+  const response = await fetch(`${API_URL}/transactions?${params}`, {
+    cache: "no-store",
+  });
+  return handleResponse<PaginatedResponse<Transaction[]>>(response);
 }
 
-export function deleteTransaction(id: string): Transaction | undefined {
-  const index = transactions.findIndex((t) => t.id === id);
-  if (index === -1) return undefined;
-  const deletedTransaction = transactions[index];
-  transactions.splice(index, 1);
-  return deletedTransaction;
+export async function getTransaction(id: string) {
+  const response = await fetch(`${API_URL}/transactions/${id}`, {
+    cache: "no-store",
+  });
+  return handleResponse<ApiResponse<Transaction>>(response);
 }
 
-export function updateTransaction(
-  id: string,
-  data: Partial<Omit<Transaction, "id" | "user_id" | "created_at">>
-): Transaction | undefined {
-  const index = transactions.findIndex((t) => t.id === id);
-  if (index === -1) return undefined;
-  transactions[index] = { ...transactions[index], ...data };
-  return transactions[index];
+export type TransactionPayload = {
+  transaction_type: "income" | "expense";
+  category: string;
+  amount: number;
+  date: string;
+  note?: string;
+};
+
+export async function addTransaction(data: TransactionPayload) {
+  const response = await fetch(`${API_URL}/transactions`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return handleResponse<ApiResponse<Transaction>>(response);
 }
+
+export async function updateTransaction(id: string, data: Partial<TransactionPayload>) {
+  const response = await fetch(`${API_URL}/transactions/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return handleResponse<ApiResponse<Transaction>>(response);
+}
+
+export async function deleteTransaction(id: string) {
+  const response = await fetch(`${API_URL}/transactions/${id}`, {
+    method: "DELETE",
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: "An error occurred" }));
+    throw new Error(error.message || "An error occurred");
+  }
+}
+
+export { ROWS_PER_PAGE };

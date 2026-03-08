@@ -10,19 +10,19 @@ import {
 import { fieldStyle } from "@/lib/constants";
 import { Category } from "@/types";
 
-const CATEGORIES: Array<Category | "All"> = [
-  "All",
-  "Salary & Wages",
-  "Returns",
-  "Gift",
-  "Groceries",
-  "Dining",
-  "Transport",
-  "Entertainment",
-  "Utilities & Bills",
-  "Education",
-  "Subscriptions",
-  "Other",
+const CATEGORIES: Array<{ value: Category | "All"; label: string }> = [
+  { value: "All", label: "All" },
+  { value: "salary_wages", label: "Salary & Wages" },
+  { value: "returns", label: "Returns" },
+  { value: "gift", label: "Gift" },
+  { value: "groceries", label: "Groceries" },
+  { value: "dining", label: "Dining" },
+  { value: "transport", label: "Transport" },
+  { value: "entertainment", label: "Entertainment" },
+  { value: "utilities_bills", label: "Utilities & Bills" },
+  { value: "education", label: "Education" },
+  { value: "subscriptions", label: "Subscriptions" },
+  { value: "other", label: "Other" },
 ];
 
 interface TransactionFiltersProps {
@@ -55,7 +55,7 @@ export default function TransactionFilters({
         </SelectTrigger>
         <SelectContent>
           {CATEGORIES.map((c) => (
-            <SelectItem key={c} value={c}>{c}</SelectItem>
+            <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
           ))}
         </SelectContent>
       </Select>

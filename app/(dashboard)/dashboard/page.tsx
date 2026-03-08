@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useMemo } from "react";
-import { getTransactions } from "@/services/transactions";
+import { useState, useMemo, useEffect } from "react";
 import BalanceCard from "./components/BalanceCard";
 import IncomeExpenseChart from "./components/IncomeExpenseChart";
 import SpendingBreakdownChart from "./components/SpendingBreakdownChart";
-import { AIInsight, Transaction } from "@/types";
+import RecentTransactions from "./components/RecentTransactions";
+import AIInsightsPanel from "./components/AIInsightsPanel";
 import {
   Select,
   SelectContent,
@@ -13,10 +13,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import RecentTransactions from "./components/RecentTransactions";
-import AIInsightsPanel from "./components/AIInsightsPanel";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useTransactions } from "@/hooks/useTransactions";
 import { getInsights } from "@/services/insights";
 import { isWithinInterval, parseISO } from "date-fns";
+import { Transaction, AIInsight } from "@/types";
+
 
 export type FilterPeriod = "week" | "month" | "year";
 
@@ -41,21 +43,27 @@ function filterByPeriod(transactions: Transaction[], period: FilterPeriod): Tran
 }
 
 export default function DashboardPage() {
-  const transactions: Transaction[] = getTransactions();
-  const insights: AIInsight[] = getInsights();
-  const [period, setPeriod] = useState<FilterPeriod>("month");
+  const [period, setPeriod] = useState<FilterPeriod>("year");
+  const [insights, setInsights] = useState<AIInsight[]>([]);
 
-  // Total balance is always cumulative across all transactions
-  const balance = useMemo(() => transactions.reduce((sum, t) => (
-    t.type === "income" ? sum + t.amount : sum - t.amount
-  ), 0), [transactions]);
+  // Fetch all transactions for dashboard (no pagination — we need full data for charts)
+  const { data, isLoading } = useTransactions(1, undefined, undefined);
+  const transactions = useMemo(() => data?.data ?? [], [data]);
 
-  // Income and expenses respond to the selected period
+  useEffect(() => {
+    getInsights().then(setInsights);
+  }, []);
+
+  const balance = useMemo(() =>
+    transactions.reduce((sum, t) =>
+      t.transaction_type === "income" ? sum + t.amount : sum - t.amount, 0
+    ), [transactions]);
+
   const { income, expenses } = useMemo(() => {
     const periodTransactions = filterByPeriod(transactions, period);
     return periodTransactions.reduce(
       (acc, t) => {
-        if (t.type === "income") acc.income += t.amount;
+        if (t.transaction_type === "income") acc.income += t.amount;
         else acc.expenses += t.amount;
         return acc;
       },
@@ -65,7 +73,8 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-6 px-8 py-10">
-      {/* Header row */}
+
+      {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Overview</h1>
         <Select value={period} onValueChange={(v) => setPeriod(v as FilterPeriod)}>
@@ -80,20 +89,36 @@ export default function DashboardPage() {
         </Select>
       </div>
 
-      {/* Balance — outside the period filter intentionally */}
-      <BalanceCard balance={balance} income={income} expenses={expenses} period={period} />
+      {isLoading ? (
+        <Skeleton className="h-32 w-full rounded-sm" />
+      ) : (
+        <BalanceCard balance={balance} income={income} expenses={expenses} period={period} />
+      )}
 
       {/* Charts */}
       <div className="flex flex-col lg:flex-row gap-6">
-        <IncomeExpenseChart transactions={transactions} period={period} />
-        <SpendingBreakdownChart transactions={transactions} period={period} />
+        {isLoading ? (
+          <>
+            <Skeleton className="flex-1 h-72 rounded-sm" />
+            <Skeleton className="flex-1 h-72 rounded-sm" />
+          </>
+        ) : (
+          <>
+            <IncomeExpenseChart transactions={transactions} period={period} />
+            <SpendingBreakdownChart transactions={transactions} period={period} />
+          </>
+        )}
       </div>
 
       <div className="h-px w-[90%] mx-auto bg-muted mt-4" />
 
       {/* Recent Transactions and Insights */}
       <div className="flex flex-col lg:flex-row gap-6">
-        <RecentTransactions transactions={transactions} />
+        {isLoading ? (
+          <Skeleton className="flex-1 h-64 rounded-sm" />
+        ) : (
+          <RecentTransactions transactions={transactions} />
+        )}
         <AIInsightsPanel insights={insights} />
       </div>
 

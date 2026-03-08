@@ -9,7 +9,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { Transaction } from "@/types";
+import { Transaction, getCategoryLabel } from "@/types";
 import { FilterPeriod } from "../page";
 
 interface SpendingBreakdownChartProps {
@@ -35,12 +35,10 @@ const CHART_COLORS = [
   "var(--chart-5)",
 ];
 
-// ── Helpers ────────────────────────────────────────────────
-
 function filterByPeriod(transactions: Transaction[], period: FilterPeriod): Transaction[] {
   const now = new Date();
   return transactions.filter((t) => {
-    if (t.type === "income") return false; // expenses only
+    if (t.transaction_type === "income") return false;
     const d = new Date(t.date);
     if (period === "week") {
       const startOfWeek = new Date(now);
@@ -61,14 +59,13 @@ function filterByPeriod(transactions: Transaction[], period: FilterPeriod): Tran
 function groupByCategory(transactions: Transaction[]): ChartEntry[] {
   const totals: Record<string, number> = {};
   transactions.forEach((t) => {
-    totals[t.category] = (totals[t.category] ?? 0) + t.amount;
+    const label = getCategoryLabel(t.category);
+    totals[label] = (totals[label] ?? 0) + t.amount;
   });
   return Object.entries(totals)
     .map(([name, value]) => ({ name, value: parseFloat(value.toFixed(2)) }))
     .sort((a, b) => b.value - a.value);
 }
-
-// ── Custom Tooltip ─────────────────────────────────────────
 
 function CustomTooltip({ active, payload }: TooltipProps) {
   if (!active || !payload?.length) return null;
@@ -80,8 +77,6 @@ function CustomTooltip({ active, payload }: TooltipProps) {
     </div>
   );
 }
-
-// ── Custom Legend ──────────────────────────────────────────
 
 function CustomLegend({ data }: { data: ChartEntry[] }) {
   const total = data.reduce((sum, d) => sum + d.value, 0);
@@ -105,8 +100,6 @@ function CustomLegend({ data }: { data: ChartEntry[] }) {
     </ul>
   );
 }
-
-// ── Component ──────────────────────────────────────────────
 
 export default function SpendingBreakdownChart({ transactions, period }: SpendingBreakdownChartProps) {
   const data = useMemo(() => {
@@ -163,7 +156,6 @@ export default function SpendingBreakdownChart({ transactions, period }: Spendin
             </PieChart>
           </ResponsiveContainer>
 
-          {/* Centre label */}
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
             <p className="text-xs text-muted-foreground">Total</p>
             <p className="text-lg font-semibold">${total.toFixed(2)}</p>

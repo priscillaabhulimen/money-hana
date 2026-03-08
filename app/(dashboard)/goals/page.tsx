@@ -1,23 +1,23 @@
 'use client';
 
 import { useState } from "react";
-import { getGoals, deleteGoal } from "@/services/goals";
-import { Goal, Category } from "@/types";
+import { Goal, ExpenseCategory } from "@/types";
 import { Plus } from "lucide-react";
 import { buttonStyle } from "@/lib/constants";
 import GoalCard from "./components/GoalCard";
 import GoalModal from "./components/GoalModal";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FilterPeriod } from "../dashboard/page";
+import GoalCardSkeleton from "@/components/skeletons/goal-card";
+import { useGoals, useDeleteGoal } from "@/hooks/useGoals";
 
 export default function GoalsPage() {
-  const goals: Goal[] = getGoals();
+  const { data, isLoading, isError } = useGoals();
+  const deleteGoal = useDeleteGoal();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<Goal | undefined>(undefined);
-  const [period, setPeriod] = useState<FilterPeriod>("month");
 
-  const existingCategories = goals.map((g) => g.category as Category);
+  const goals = data?.data ?? [];
+  const existingCategories = goals.map((g) => g.category as ExpenseCategory);
 
   function handleEdit(goal: Goal) {
     setEditingGoal(goal);
@@ -25,7 +25,7 @@ export default function GoalsPage() {
   }
 
   function handleDelete(id: string) {
-    deleteGoal(id);
+    deleteGoal.mutate(id);
   }
 
   function handleModalClose() {
@@ -48,20 +48,15 @@ export default function GoalsPage() {
         </button>
       </div>
 
-      {/* Period dropdown */}
-      <Select value={period} onValueChange={(v) => setPeriod(v as FilterPeriod)}>
-        <SelectTrigger className="w-36 text-xs bg-muted border-0 shadow-none focus:ring-0 cursor-pointer">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="week">This Week</SelectItem>
-          <SelectItem value="month">This Month</SelectItem>
-          <SelectItem value="year">This Year</SelectItem>
-        </SelectContent>
-      </Select>
+      {isError && (
+        <p className="text-sm text-red-500">Failed to load goals. Please try again.</p>
+      )}
 
-      {/* Goals grid */}
-      {goals.length === 0 ? (
+      {isLoading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+          {Array.from({ length: 3 }).map((_, i) => <GoalCardSkeleton key={i} />)}
+        </div>
+      ) : goals.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-center gap-2">
           <p className="text-sm font-medium">No goals yet</p>
           <p className="text-xs text-muted-foreground">
@@ -81,7 +76,6 @@ export default function GoalsPage() {
         </div>
       )}
 
-      {/* Modal */}
       {modalOpen && (
         <GoalModal
           onClose={handleModalClose}

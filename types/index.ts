@@ -1,17 +1,51 @@
 export type InsightType = "flag" | "pattern" | "goal_warning";
 export type TransactionType = "income" | "expense";
 
-export type IncomeCategory = "Salary & Wages" | "Returns" | "Gift" | "Other";
+export type IncomeCategory =
+  | "salary_wages"
+  | "returns"
+  | "gift"
+  | "other";
+
 export type ExpenseCategory =
-  | "Groceries"
-  | "Dining"
-  | "Transport"
-  | "Entertainment"
-  | "Utilities & Bills"
-  | "Education"
-  | "Subscriptions"
-  | "Other";
+  | "groceries"
+  | "dining"
+  | "transport"
+  | "entertainment"
+  | "utilities_bills"
+  | "education"
+  | "subscriptions"
+  | "other";
+
 export type Category = IncomeCategory | ExpenseCategory;
+
+// Display label maps for UI rendering
+export const INCOME_CATEGORY_LABELS: Record<IncomeCategory, string> = {
+  salary_wages: "Salary & Wages",
+  returns: "Returns",
+  gift: "Gift",
+  other: "Other",
+};
+
+export const EXPENSE_CATEGORY_LABELS: Record<ExpenseCategory, string> = {
+  groceries: "Groceries",
+  dining: "Dining",
+  transport: "Transport",
+  entertainment: "Entertainment",
+  utilities_bills: "Utilities & Bills",
+  education: "Education",
+  subscriptions: "Subscriptions",
+  other: "Other",
+};
+
+export const ALL_CATEGORY_LABELS: Record<Category, string> = {
+  ...INCOME_CATEGORY_LABELS,
+  ...EXPENSE_CATEGORY_LABELS,
+};
+
+export function getCategoryLabel(category: Category): string {
+  return ALL_CATEGORY_LABELS[category] ?? category;
+}
 
 export interface User {
   id: string;
@@ -20,12 +54,13 @@ export interface User {
   email: string;
 }
 
+// API shape — transaction_type matches backend
 export interface Transaction {
   id: string;
   user_id: string;
   amount: number;
   category: Category;
-  type: TransactionType;
+  transaction_type: TransactionType;
   note?: string;
   date: string;
   created_at: string;
@@ -34,7 +69,7 @@ export interface Transaction {
 export interface Goal {
   id: string;
   user_id: string;
-  category: Category;
+  category: ExpenseCategory;
   monthly_limit: number;
   current_spend: number;
   created_at: string;
@@ -45,4 +80,19 @@ export interface AIInsight {
   type: InsightType;
   message: string;
   created_at: string;
+}
+
+// Paginated API response shape
+export interface PaginatedResponse<T> {
+  status: string;
+  data: T;
+  total: number;
+  limit: number;
+  page: number;
+}
+
+export interface ApiResponse<T> {
+  status: string;
+  data: T;
+  message?: string;
 }

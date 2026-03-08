@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Transaction } from "@/types";
+import { Transaction, getCategoryLabel } from "@/types";
 import { format, parseISO } from "date-fns";
 import { Edit2, MoreVertical, Trash } from "lucide-react";
 import {
@@ -11,14 +11,12 @@ import {
 
 interface TransactionTableProps {
   transactions: Transaction[];
-  runningBalances: Map<string, number>;
   onEdit: (transaction: Transaction) => void;
   onDelete: (id: string) => void;
 }
 
 export default function TransactionTable({
   transactions,
-  runningBalances,
   onEdit,
   onDelete,
 }: TransactionTableProps) {
@@ -33,14 +31,13 @@ export default function TransactionTable({
                 <th className="text-left text-sm font-medium text-muted-foreground px-5 py-3">Note</th>
                 <th className="text-left text-sm font-medium text-muted-foreground px-5 py-3">Category</th>
                 <th className="text-right text-sm font-medium text-muted-foreground px-5 py-3">Amount</th>
-                <th className="text-right text-sm font-medium text-muted-foreground px-5 py-3">Balance</th>
                 <th className="text-right text-sm font-medium text-muted-foreground px-5 py-3">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {transactions.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center text-muted-foreground py-12 text-sm">
+                  <td colSpan={5} className="text-center text-muted-foreground py-12 text-sm">
                     No transactions match your filters.
                   </td>
                 </tr>
@@ -55,16 +52,13 @@ export default function TransactionTable({
                     </td>
                     <td className="px-5 py-3.5">
                       <span className="inline-block bg-muted text-muted-foreground text-xs px-2 py-0.5 rounded-sm">
-                        {t.category}
+                        {getCategoryLabel(t.category)}
                       </span>
                     </td>
                     <td className={`px-5 py-3.5 text-right font-medium whitespace-nowrap ${
-                      t.type === "income" ? "text-green-500" : "text-red-500/85"
+                      t.transaction_type === "income" ? "text-green-500" : "text-red-500/85"
                     }`}>
-                      {t.type === "income" ? "+" : "-"}${t.amount.toFixed(2)}
-                    </td>
-                    <td className="px-5 py-3.5 text-right text-muted-foreground whitespace-nowrap">
-                      ${runningBalances.get(t.id)?.toFixed(2) ?? "—"}
+                      {t.transaction_type === "income" ? "+" : "-"}${t.amount.toFixed(2)}
                     </td>
                     <td className="px-5 py-3.5 text-right">
                       <DropdownMenu>

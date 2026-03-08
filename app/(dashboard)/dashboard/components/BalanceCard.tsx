@@ -37,7 +37,7 @@ export default function BalanceCard({ balance, income, expenses, period }: Balan
           {/* Expenses — period-aware */}
           <div className="flex-1 w-full lg:w-auto">
             <div className="flex justify-between items-center">
-              <p className="text-sm font-light text-muted-foreground">{periodLabel}{"'s"}Expenses</p>
+              <p className="text-sm font-light text-muted-foreground">{periodLabel}{"'s"} Expenses</p>
               <ArrowUpRight className="text-red-500/85" size={16} />
             </div>
             <h2 className="text-3xl font-bold pt-6 text-red-500/85">${expenses.toFixed(2)}</h2>

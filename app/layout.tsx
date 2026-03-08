@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Bebas_Neue, Plus_Jakarta_Sans } from "next/font/google";
 import { ThemeProvider } from 'next-themes';
+import { validateEnv } from '@/lib/env';
+import QueryProvider from '@/components/QueryProvider';
+
+validateEnv();
 
 const bebas = Bebas_Neue({
   weight: "400",
@@ -26,13 +30,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    // suppressHydrationWarning is required here because next-themes injects
-    // the theme class on the client after SSR, causing a mismatch on <html>.
-    // This is the officially recommended fix from the next-themes docs.
     <html lang="en" className={`${bebas.variable} ${jakarta.variable}`} suppressHydrationWarning>
       <body className="font-jakarta antialiased">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          {children}
+          <QueryProvider>
+            {children}
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>

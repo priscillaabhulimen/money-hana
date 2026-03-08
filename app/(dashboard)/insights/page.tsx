@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { AIInsight, InsightType } from "@/types";
 import { format, parseISO } from "date-fns";
 import InsightTypeToggle from "./components/InsightTypeToggle";
@@ -8,7 +8,7 @@ import InsightGroup from "./components/InsightGroup";
 import InsightPagination from "./components/InsightPagination";
 import { getInsights } from "@/services/insights";
 
-const ROWS_PER_PAGE = 30;
+const ROWS_PER_PAGE = 10;
 
 function groupByDate(insights: AIInsight[]): Record<string, AIInsight[]> {
   const sorted = [...insights].sort(
@@ -23,10 +23,13 @@ function groupByDate(insights: AIInsight[]): Record<string, AIInsight[]> {
 }
 
 export default function InsightsPage() {
-  const insights: AIInsight[] = getInsights();
-
+  const [insights, setInsights] = useState<AIInsight[]>([]);
   const [activeType, setActiveType] = useState<InsightType | "All">("All");
   const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    getInsights().then(setInsights);
+  }, []);
 
   const filtered = useMemo(() => {
     if (activeType === "All") return insights;

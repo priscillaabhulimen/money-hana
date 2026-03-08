@@ -1,4 +1,4 @@
-import { Goal } from "@/types";
+import { Goal, getCategoryLabel } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   DropdownMenu,
@@ -34,7 +34,7 @@ export default function GoalCard({ goal, onEdit, onDelete }: GoalCardProps) {
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div>
-            <p className="text-sm font-medium">{goal.category}</p>
+            <p className="text-sm font-medium">{getCategoryLabel(goal.category)}</p>
             <p className={`text-xs mt-0.5 ${status.color}`}>{status.label}</p>
           </div>
           <DropdownMenu>
