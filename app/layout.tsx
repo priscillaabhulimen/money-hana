@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Bebas_Neue, Plus_Jakarta_Sans } from "next/font/google";
 import { ThemeProvider } from 'next-themes';
+import { validateEnv } from '@/lib/env';
+
+validateEnv();
 
 const bebas = Bebas_Neue({
   weight: "400",
