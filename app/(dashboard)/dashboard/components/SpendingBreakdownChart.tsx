@@ -11,6 +11,7 @@ import {
 } from "recharts";
 import { Transaction, getCategoryLabel } from "@/types";
 import { FilterPeriod } from "../page";
+import { parseISO } from "date-fns";
 
 interface SpendingBreakdownChartProps {
   transactions: Transaction[];
@@ -39,7 +40,7 @@ function filterByPeriod(transactions: Transaction[], period: FilterPeriod): Tran
   const now = new Date();
   return transactions.filter((t) => {
     if (t.transaction_type === "income") return false;
-    const d = new Date(t.date);
+    const d = parseISO(t.date);
     if (period === "week") {
       const startOfWeek = new Date(now);
       startOfWeek.setDate(now.getDate() - now.getDay());
