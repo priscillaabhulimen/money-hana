@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   PieChart,
   Pie,
-  Cell,
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
@@ -21,6 +20,7 @@ interface SpendingBreakdownChartProps {
 interface ChartEntry {
   name: string;
   value: number;
+  fill: string;
 }
 
 interface TooltipProps {
@@ -65,7 +65,11 @@ function groupByCategory(transactions: Transaction[]): ChartEntry[] {
   });
   return Object.entries(totals)
     .map(([name, value]) => ({ name, value: parseFloat(value.toFixed(2)) }))
-    .sort((a, b) => b.value - a.value);
+    .sort((a, b) => b.value - a.value)
+    .map((entry, i) => ({
+      ...entry,
+      fill: CHART_COLORS[i % CHART_COLORS.length],
+    }));
 }
 
 function CustomTooltip({ active, payload }: TooltipProps) {
@@ -83,12 +87,12 @@ function CustomLegend({ data }: { data: ChartEntry[] }) {
   const total = data.reduce((sum, d) => sum + d.value, 0);
   return (
     <ul className="flex flex-col gap-1.5 mt-3">
-      {data.map((entry, i) => (
+      {data.map((entry) => (
         <li key={entry.name} className="flex items-center justify-between text-xs">
           <div className="flex items-center gap-2">
             <span
               className="inline-block w-2 h-2 rounded-full shrink-0"
-              style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}
+              style={{ backgroundColor: entry.fill }}
             />
             <span className="text-muted-foreground">{entry.name}</span>
           </div>
@@ -144,15 +148,9 @@ export default function SpendingBreakdownChart({ transactions, period }: Spendin
                 outerRadius={90}
                 paddingAngle={3}
                 dataKey="value"
+                nameKey="name"
                 strokeWidth={0}
-              >
-                {data.map((_, i) => (
-                  <Cell
-                    key={`cell-${i}`}
-                    fill={CHART_COLORS[i % CHART_COLORS.length]}
-                  />
-                ))}
-              </Pie>
+              />
               <Tooltip content={<CustomTooltip />} />
             </PieChart>
           </ResponsiveContainer>

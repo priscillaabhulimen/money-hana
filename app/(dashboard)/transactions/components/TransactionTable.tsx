@@ -8,6 +8,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useState } from "react";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 interface TransactionTableProps {
   transactions: Transaction[];
@@ -20,78 +22,103 @@ export default function TransactionTable({
   onEdit,
   onDelete,
 }: TransactionTableProps) {
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+
+  const handleDelete = () => {
+    if (selectedTransaction) {
+      onDelete(selectedTransaction.id);
+      setSelectedTransaction(null);
+      setShowDeleteConfirm(false);
+    }
+  };
+
   return (
-    <Card className="border-0 shadow-sm bg-card rounded-sm overflow-hidden p-0">
-      <CardContent className="p-0">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border">
-                <th className="text-left text-sm font-medium text-muted-foreground px-5 py-3">Date</th>
-                <th className="text-left text-sm font-medium text-muted-foreground px-5 py-3">Note</th>
-                <th className="text-left text-sm font-medium text-muted-foreground px-5 py-3">Category</th>
-                <th className="text-right text-sm font-medium text-muted-foreground px-5 py-3">Amount</th>
-                <th className="text-right text-sm font-medium text-muted-foreground px-5 py-3">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {transactions.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="text-center text-muted-foreground py-12 text-sm">
-                    No transactions match your filters.
-                  </td>
+    <>
+      <Card className="border-0 shadow-sm bg-card rounded-sm overflow-hidden p-0">
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border">
+                  <th className="text-left text-sm font-medium text-muted-foreground px-5 py-3">Date</th>
+                  <th className="text-left text-sm font-medium text-muted-foreground px-5 py-3">Note</th>
+                  <th className="text-left text-sm font-medium text-muted-foreground px-5 py-3">Category</th>
+                  <th className="text-right text-sm font-medium text-muted-foreground px-5 py-3">Amount</th>
+                  <th className="text-right text-sm font-medium text-muted-foreground px-5 py-3">Actions</th>
                 </tr>
-              ) : (
-                transactions.map((t) => (
-                  <tr key={t.id}>
-                    <td className="px-5 py-3.5 text-muted-foreground whitespace-nowrap">
-                      {format(parseISO(t.date), "MMM d, yyyy")}
-                    </td>
-                    <td className="px-5 py-3.5 max-w-xs truncate">
-                      {t.note ?? "—"}
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <span className="inline-block bg-muted text-muted-foreground text-xs px-2 py-0.5 rounded-sm">
-                        {getCategoryLabel(t.category)}
-                      </span>
-                    </td>
-                    <td className={`px-5 py-3.5 text-right font-medium whitespace-nowrap ${
-                      t.transaction_type === "income" ? "text-green-500" : "text-red-500/85"
-                    }`}>
-                      {t.transaction_type === "income" ? "+" : "-"}${t.amount.toFixed(2)}
-                    </td>
-                    <td className="px-5 py-3.5 text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button
-                            type="button"
-                            className="p-1.5 hover:bg-muted rounded-sm transition-colors cursor-pointer"
-                          >
-                            <MoreVertical size={16} className="text-muted-foreground" />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => onEdit(t)}>
-                            <Edit2 size={14} className="mr-2" />
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => onDelete(t.id)}
-                            className="text-red-500 focus:text-red-500"
-                          >
-                            <Trash size={14} className="mr-2" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {transactions.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="text-center text-muted-foreground py-12 text-sm">
+                      No transactions match your filters.
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </CardContent>
-    </Card>
+                ) : (
+                  transactions.map((t) => (
+                    <tr key={t.id}>
+                      <td className="px-5 py-3.5 text-muted-foreground whitespace-nowrap">
+                        {format(parseISO(t.date), "MMM d, yyyy")}
+                      </td>
+                      <td className="px-5 py-3.5 max-w-xs truncate">
+                        {t.note ?? "—"}
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <span className="inline-block bg-muted text-muted-foreground text-xs px-2 py-0.5 rounded-sm">
+                          {getCategoryLabel(t.category)}
+                        </span>
+                      </td>
+                      <td className={`px-5 py-3.5 text-right font-medium whitespace-nowrap ${
+                        t.transaction_type === "income" ? "text-green-500" : "text-red-500/85"
+                      }`}>
+                        {t.transaction_type === "income" ? "+" : "-"}${t.amount.toFixed(2)}
+                      </td>
+                      <td className="px-5 py-3.5 text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button
+                              type="button"
+                              className="p-1.5 hover:bg-muted rounded-sm transition-colors cursor-pointer"
+                            >
+                              <MoreVertical size={16} className="text-muted-foreground" />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => onEdit(t)}>
+                              <Edit2 size={14} className="mr-2" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setSelectedTransaction(t);
+                                setShowDeleteConfirm(true);
+                              }}
+                              className="text-red-500 focus:text-red-500"
+                            >
+                              <Trash size={14} className="mr-2" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+
+      <ConfirmDialog
+        open={showDeleteConfirm}
+        title="Delete Transaction"
+        description="Are you sure you want to delete this transaction? This action cannot be undone."
+        confirmLabel="Delete"
+        onConfirm={handleDelete}
+        onCancel={() => setShowDeleteConfirm(false)}
+      />
+    </>
   );
 }
