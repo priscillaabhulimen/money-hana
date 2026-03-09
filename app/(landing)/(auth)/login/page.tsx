@@ -32,8 +32,7 @@ export default function LoginPage() {
   async function onSubmit(data: LoginForm) {
     setServerError(null);
     try {
-      const res = await loginUser(data);
-      // TODO Week 4: store res.data.access_token (context/cookie/localStorage)
+      await loginUser(data);
       router.push("/dashboard");
     } catch (err) {
       setServerError(err instanceof Error ? err.message : "Login failed");

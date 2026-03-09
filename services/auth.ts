@@ -6,42 +6,56 @@ async function handleResponse<T>(res: Response): Promise<T> {
   return data;
 }
 
+function authFetch(path: string, options: RequestInit = {}) {
+  return fetch(`${API}${path}`, {
+    ...options,
+    credentials: "include", // sends/receives httponly cookies automatically
+    headers: { "Content-Type": "application/json", ...options.headers },
+  });
+}
+
 export async function registerUser(payload: {
   first_name: string;
   last_name: string;
   email: string;
   password: string;
 }) {
-  const res = await fetch(`${API}/api/v1/auth/register`, {
+  const res = await authFetch("/api/v1/register", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
   return handleResponse(res);
 }
 
 export async function loginUser(payload: { email: string; password: string }) {
-  const res = await fetch(`${API}/api/v1/auth/login`, {
+  const res = await authFetch("/api/v1/login", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
-  return handleResponse<{ data: { access_token: string } }>(res);
+  return handleResponse<{ data: { id: string; first_name: string; last_name: string; email: string } }>(res);
+}
+
+export async function logoutUser() {
+  const res = await authFetch("/api/v1/logout", { method: "POST" });
+  return handleResponse(res);
+}
+
+export async function refreshSession() {
+  const res = await authFetch("/api/v1/refresh", { method: "POST" });
+  return handleResponse(res);
 }
 
 export async function verifyEmail(token: string) {
-  const res = await fetch(`${API}/api/v1/auth/verify-email`, {
+  const res = await authFetch("/api/v1/verify-email", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ token }),
   });
   return handleResponse(res);
 }
 
 export async function resendVerification(email: string) {
-  const res = await fetch(`${API}/api/v1/auth/resend-verification`, {
+  const res = await authFetch("/api/v1/resend-verification", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email }),
   });
   return handleResponse(res);
