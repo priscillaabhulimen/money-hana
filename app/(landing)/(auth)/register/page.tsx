@@ -8,6 +8,7 @@ import { Eye, EyeOff, Lock } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { registerUser } from "@/services/auth";
 
 const schema = z.object({
   email: z.string().trim()
@@ -33,15 +34,24 @@ export default function RegisterForm() {
     mode: "onChange",
   });
 
-  // Separate toggles so each field controls its own visibility
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-
+  const [serverError, setServerError] = useState<string | null>(null);
   const router = useRouter();
 
-  function onSubmit(data: RegisterForm) {
-    console.log(data);
-    router.push('/dashboard');
+  async function onSubmit(data: RegisterForm) {
+    setServerError(null);
+    try {
+      await registerUser({
+        first_name: data.firstName,
+        last_name: data.lastName,
+        email: data.email,
+        password: data.password,
+      });
+      router.push("/verify-email");
+    } catch (err) {
+      setServerError(err instanceof Error ? err.message : "Registration failed");
+    }
   }
 
   return (
@@ -131,12 +141,16 @@ export default function RegisterForm() {
               <p className="text-red-500 text-xs mt-1">{errors.confirmPassword.message}</p>
             )}
 
+            {serverError && (
+              <p className="text-red-500 text-xs mt-3 text-center">{serverError}</p>
+            )}
+
             <button
               type="submit"
               disabled={!isValid || isSubmitting}
               className={`${buttonStyle} mt-10`}
             >
-              Register
+              {isSubmitting ? "Creating account..." : "Register"}
             </button>
 
             <div className="mt-2.5 flex gap-1 justify-center">
