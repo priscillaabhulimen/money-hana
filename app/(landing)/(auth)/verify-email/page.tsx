@@ -1,35 +1,58 @@
 'use client';
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { verifyEmail } from "@/services/auth";
+import { IconCircle } from "./components/IconCircle";
+import { ResendForm } from "./components/ResendForm";
+import { EmailIcon } from "./components/AuthIcons";
+import { VerifyErrorState } from "./components/VerifyErrorStat";
+import { VerifyingState } from "./components/VerifyingState";
 
 export default function VerifyEmailPage() {
-  const [resent, setResent] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const token = searchParams.get("token");
 
-  async function handleResend() {
-    setIsLoading(true);
-    try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/resend-verification`, {
-        method: "POST",
-        credentials: "include",
-      });
-      setResent(true);
-    } finally {
-      setIsLoading(false);
+  const [isVerifying, setIsVerifying] = useState(!!token);
+  const [verifyError, setVerifyError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!token) return;
+
+    async function verify() {
+      try {
+        await verifyEmail(token!);
+        router.push("/email-verified");
+      } catch (err) {
+        setVerifyError(err instanceof Error ? err.message : "Verification failed. The link may have expired.");
+      } finally {
+        setIsVerifying(false);
+      }
     }
+
+    verify();
+  }, [token, router]);
+
+  if (token) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen text-center px-4">
+        <div className="flex flex-col items-center gap-6 max-w-md">
+          {isVerifying && <VerifyingState />}
+          {verifyError && <VerifyErrorState message={verifyError} />}
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen text-center px-4">
       <div className="flex flex-col items-center gap-6 max-w-md">
 
-        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary">
-            <rect width="20" height="16" x="2" y="4" rx="2" />
-            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-          </svg>
-        </div>
+        <IconCircle>
+          <EmailIcon className="text-primary" />
+        </IconCircle>
 
         <div className="flex flex-col gap-2">
           <h1 className="text-2xl font-semibold">Check your inbox</h1>
@@ -39,21 +62,7 @@ export default function VerifyEmailPage() {
           </p>
         </div>
 
-        {resent ? (
-          <p className="text-xs text-green-500">Verification email resent.</p>
-        ) : (
-          <p className="text-xs text-muted-foreground">
-            Didn&apos;t receive it? Check your spam folder or{" "}
-            <button
-              onClick={handleResend}
-              disabled={isLoading}
-              className="text-primary hover:underline disabled:opacity-50"
-            >
-              {isLoading ? "Sending..." : "resend the email"}
-            </button>
-            .
-          </p>
-        )}
+        <ResendForm />
 
         <Link href="/login" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
           Back to login
