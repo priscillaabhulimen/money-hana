@@ -1,4 +1,4 @@
-const API = process.env.NEXT_PUBLIC_API_URL;
+import { API_URL } from "@/lib/env";
 
 async function handleResponse<T>(res: Response): Promise<T> {
   const data = await res.json();
@@ -7,7 +7,7 @@ async function handleResponse<T>(res: Response): Promise<T> {
 }
 
 function authFetch(path: string, options: RequestInit = {}) {
-  return fetch(`${API}${path}`, {
+  return fetch(`${API_URL}${path}`, {
     ...options,
     credentials: "include", // sends/receives httponly cookies automatically
     headers: { "Content-Type": "application/json", ...options.headers },
@@ -20,7 +20,7 @@ export async function registerUser(payload: {
   email: string;
   password: string;
 }) {
-  const res = await authFetch("/api/v1/register", {
+  const res = await authFetch("/register", {
     method: "POST",
     body: JSON.stringify(payload),
   });
@@ -28,7 +28,7 @@ export async function registerUser(payload: {
 }
 
 export async function loginUser(payload: { email: string; password: string }) {
-  const res = await authFetch("/api/v1/login", {
+  const res = await authFetch("/login", {
     method: "POST",
     body: JSON.stringify(payload),
   });
@@ -36,17 +36,17 @@ export async function loginUser(payload: { email: string; password: string }) {
 }
 
 export async function logoutUser() {
-  const res = await authFetch("/api/v1/logout", { method: "POST" });
+  const res = await authFetch("/logout", { method: "POST" });
   return handleResponse(res);
 }
 
 export async function refreshSession() {
-  const res = await authFetch("/api/v1/refresh", { method: "POST" });
+  const res = await authFetch("/refresh", { method: "POST" });
   return handleResponse(res);
 }
 
 export async function verifyEmail(token: string) {
-  const res = await authFetch("/api/v1/verify-email", {
+  const res = await authFetch("/verify-email", {
     method: "POST",
     body: JSON.stringify({ token }),
   });
@@ -54,7 +54,7 @@ export async function verifyEmail(token: string) {
 }
 
 export async function resendVerification(email: string) {
-  const res = await authFetch("/api/v1/resend-verification", {
+  const res = await authFetch("/resend-verification", {
     method: "POST",
     body: JSON.stringify({ email }),
   });

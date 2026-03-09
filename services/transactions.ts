@@ -1,7 +1,7 @@
 import { Transaction, ApiResponse, PaginatedResponse } from "@/types";
+import { API_URL } from "@/lib/env";
 
 const ROWS_PER_PAGE = 30;
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
