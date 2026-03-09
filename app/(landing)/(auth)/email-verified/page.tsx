@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function EmailVerifiedPage() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen text-center px-4">
+    <div className="flex-1 flex flex-col items-center justify-center min-h-screen text-center px-4">
       <div className="flex flex-col items-center gap-6 max-w-md">
 
         <div className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center">

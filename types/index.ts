@@ -52,6 +52,7 @@ export interface User {
   firstName: string;
   lastName: string;
   email: string;
+  isVerified: boolean;
 }
 
 // API shape — transaction_type matches backend

@@ -37,7 +37,7 @@ export default function VerifyEmailPage() {
 
   if (token) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen text-center px-4">
+      <div className="flex flex-1 flex-col items-center justify-center min-h-screen text-center px-4">
         <div className="flex flex-col items-center gap-6 max-w-md">
           {isVerifying && <VerifyingState />}
           {verifyError && <VerifyErrorState message={verifyError} />}
@@ -47,7 +47,7 @@ export default function VerifyEmailPage() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen text-center px-4">
+    <div className="flex-1 flex flex-col items-center justify-center min-h-screen text-center px-4">
       <div className="flex flex-col items-center gap-6 max-w-md">
 
         <IconCircle>

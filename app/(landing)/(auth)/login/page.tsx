@@ -9,6 +9,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { loginUser } from "@/services/auth";
+import { useQueryClient } from "@tanstack/react-query";
+import { authKeys } from "@/hooks/useCurrentUser";
 
 const schema = z.object({
   email: z.string()
@@ -28,11 +30,17 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   async function onSubmit(data: LoginForm) {
     setServerError(null);
     try {
-      await loginUser(data);
+      const result = await loginUser(data);
+      queryClient.setQueryData(authKeys.me, result);
+      if (!result.data.isVerified) {
+        router.push("/verify-email");
+        return;
+      }
       router.push("/dashboard");
     } catch (err) {
       setServerError(err instanceof Error ? err.message : "Login failed");

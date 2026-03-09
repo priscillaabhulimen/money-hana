@@ -1,29 +1,39 @@
 'use client';
 
 // import { useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import AppSidebar from "./AppSidebar";
-import { User } from "@/types";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 interface AppShellProps {
   children: React.ReactNode;
 }
 
-// Stub user — replace with real auth context / session in Week 3
-const STUB_USER: User = {
-  id: "1",
-  firstName: "Priscilla",
-  lastName: "A",
-  email: "priscilla@email.com",
-};
-
 export default function AppShell({ children }: AppShellProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { data, isLoading } = useCurrentUser();
+
+  useEffect(() => {
+    if (isLoading) return;
+    if (data?.data && !data.data.isVerified) {
+      router.replace("/verify-email");
+    }
+  }, [data, isLoading, router]);
+
+  if (isLoading) {
+    return null;
+  }
+
+  if (data?.data && !data.data.isVerified) {
+    return null;
+  }
 
   return (
     <SidebarProvider>
-      <AppSidebar pathname={pathname} user={STUB_USER} />
+      <AppSidebar pathname={pathname} user={data?.data} />
 
       <SidebarInset className="bg-background flex flex-col h-screen">
         <header className="lg:hidden sticky top-0 z-10 flex items-center gap-3 px-4 py-3 border-b border-white/10 bg-sidebar shrink-0">

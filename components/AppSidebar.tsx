@@ -39,7 +39,10 @@ const NAV_ITEMS = [
 
 function getInitials(user?: User): string {
   if (!user) return "?";
-  return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
+  const first = user.firstName?.[0] ?? "";
+  const last = user.lastName?.[0] ?? "";
+  const initials = `${first}${last}`.trim();
+  return initials ? initials.toUpperCase() : "?";
 }
 
 export default function AppSidebar({ pathname, user }: AppSidebarProps) {

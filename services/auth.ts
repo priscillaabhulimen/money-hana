@@ -1,9 +1,30 @@
 import { API_URL } from "@/lib/env";
+import { ApiResponse, User } from "@/types";
+
+type ApiUser = {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email_address: string;
+  is_verified: boolean;
+  user_type: string;
+  created_at: string;
+};
 
 async function handleResponse<T>(res: Response): Promise<T> {
   const data = await res.json();
   if (!res.ok) throw new Error(data.message ?? "Something went wrong");
   return data;
+}
+
+function toUser(user: ApiUser): User {
+  return {
+    id: user.id,
+    firstName: user.first_name,
+    lastName: user.last_name,
+    email: user.email_address,
+    isVerified: user.is_verified,
+  };
 }
 
 function authFetch(path: string, options: RequestInit = {}) {
@@ -32,7 +53,23 @@ export async function loginUser(payload: { email: string; password: string }) {
     method: "POST",
     body: JSON.stringify(payload),
   });
-  return handleResponse<{ data: { id: string; first_name: string; last_name: string; email: string } }>(res);
+  const result = await handleResponse<ApiResponse<ApiUser>>(res);
+  return {
+    ...result,
+    data: toUser(result.data),
+  };
+}
+
+export async function getCurrentUser() {
+  const res = await authFetch("/me", {
+    method: "GET",
+    cache: "no-store",
+  });
+  const result = await handleResponse<ApiResponse<ApiUser>>(res);
+  return {
+    ...result,
+    data: toUser(result.data),
+  };
 }
 
 export async function logoutUser() {
