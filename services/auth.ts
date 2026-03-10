@@ -1,5 +1,5 @@
-import { API_URL } from "@/lib/env";
 import { ApiResponse, User } from "@/types";
+import { apiFetch } from "@/services/http";
 
 type ApiUser = {
   id: string;
@@ -28,9 +28,8 @@ function toUser(user: ApiUser): User {
 }
 
 function authFetch(path: string, options: RequestInit = {}) {
-  return fetch(`${API_URL}${path}`, {
+  return apiFetch(path, {
     ...options,
-    credentials: "include", // sends/receives httponly cookies automatically
     headers: { "Content-Type": "application/json", ...options.headers },
   });
 }

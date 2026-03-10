@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Sidebar,
   SidebarContent,
@@ -47,16 +48,18 @@ function getInitials(user?: User): string {
 
 export default function AppSidebar({ pathname, user }: AppSidebarProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { setOpenMobile } = useSidebar();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   async function handleLogout() {
-  try {
-    await logoutUser();
-  } finally {
-    router.push("/login");
+    try {
+      await logoutUser();
+    } finally {
+      queryClient.clear();
+      router.push("/login");
+    }
   }
-}
 
   return (
     <Sidebar>

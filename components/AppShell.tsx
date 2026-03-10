@@ -14,7 +14,14 @@ interface AppShellProps {
 export default function AppShell({ children }: AppShellProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { data, isLoading } = useCurrentUser();
+  const { data, isLoading, isError } = useCurrentUser();
+
+  useEffect(() => {
+    if (isLoading) return;
+    if (isError) {
+      router.replace("/login");
+    }
+  }, [isError, isLoading, router]);
 
   useEffect(() => {
     if (isLoading) return;
@@ -24,6 +31,10 @@ export default function AppShell({ children }: AppShellProps) {
   }, [data, isLoading, router]);
 
   if (isLoading) {
+    return null;
+  }
+
+  if (isError) {
     return null;
   }
 

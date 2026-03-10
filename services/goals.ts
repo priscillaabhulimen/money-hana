@@ -1,5 +1,5 @@
 import { Goal, ApiResponse } from "@/types";
-import { API_URL } from "@/lib/env";
+import { apiFetch } from "@/services/http";
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
@@ -10,17 +10,15 @@ async function handleResponse<T>(response: Response): Promise<T> {
 }
 
 export async function getGoals() {
-  const response = await fetch(`${API_URL}/goals`, {
+  const response = await apiFetch("/goals", {
     cache: "no-store",
-    credentials: "include",
   });
   return handleResponse<ApiResponse<Goal[]>>(response);
 }
 
 export async function getGoal(id: string) {
-  const response = await fetch(`${API_URL}/goals/${id}`, {
+  const response = await apiFetch(`/goals/${id}`, {
     cache: "no-store",
-    credentials: "include",
   });
   return handleResponse<ApiResponse<Goal>>(response);
 }
@@ -31,9 +29,8 @@ export type GoalPayload = {
 };
 
 export async function addGoal(data: GoalPayload) {
-  const response = await fetch(`${API_URL}/goals`, {
+  const response = await apiFetch("/goals", {
     method: "POST",
-    credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
@@ -41,9 +38,8 @@ export async function addGoal(data: GoalPayload) {
 }
 
 export async function updateGoal(id: string, data: Pick<GoalPayload, "monthly_limit">) {
-  const response = await fetch(`${API_URL}/goals/${id}`, {
+  const response = await apiFetch(`/goals/${id}`, {
     method: "PATCH",
-    credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
@@ -51,9 +47,8 @@ export async function updateGoal(id: string, data: Pick<GoalPayload, "monthly_li
 }
 
 export async function deleteGoal(id: string) {
-  const response = await fetch(`${API_URL}/goals/${id}`, {
+  const response = await apiFetch(`/goals/${id}`, {
     method: "DELETE",
-    credentials: "include",
   });
   if (!response.ok) {
     const error = await response.json().catch(() => ({ message: "An error occurred" }));

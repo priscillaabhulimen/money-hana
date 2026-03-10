@@ -1,5 +1,5 @@
 import { Transaction, ApiResponse, PaginatedResponse } from "@/types";
-import { API_URL } from "@/lib/env";
+import { apiFetch } from "@/services/http";
 
 const ROWS_PER_PAGE = 30;
 
@@ -19,17 +19,15 @@ export async function getTransactions(page: number, startDate?: string, endDate?
   if (startDate) params.append("start_date", startDate);
   if (endDate) params.append("end_date", endDate);
 
-  const response = await fetch(`${API_URL}/transactions?${params}`, {
+  const response = await apiFetch(`/transactions?${params}`, {
     cache: "no-store",
-    credentials: "include",
   });
   return handleResponse<PaginatedResponse<Transaction[]>>(response);
 }
 
 export async function getTransaction(id: string) {
-  const response = await fetch(`${API_URL}/transactions/${id}`, {
+  const response = await apiFetch(`/transactions/${id}`, {
     cache: "no-store",
-    credentials: "include",
   });
   return handleResponse<ApiResponse<Transaction>>(response);
 }
@@ -43,9 +41,8 @@ export type TransactionPayload = {
 };
 
 export async function addTransaction(data: TransactionPayload) {
-  const response = await fetch(`${API_URL}/transactions`, {
+  const response = await apiFetch("/transactions", {
     method: "POST",
-    credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
@@ -53,9 +50,8 @@ export async function addTransaction(data: TransactionPayload) {
 }
 
 export async function updateTransaction(id: string, data: Partial<TransactionPayload>) {
-  const response = await fetch(`${API_URL}/transactions/${id}`, {
+  const response = await apiFetch(`/transactions/${id}`, {
     method: "PATCH",
-    credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
@@ -63,9 +59,8 @@ export async function updateTransaction(id: string, data: Partial<TransactionPay
 }
 
 export async function deleteTransaction(id: string) {
-  const response = await fetch(`${API_URL}/transactions/${id}`, {
+  const response = await apiFetch(`/transactions/${id}`, {
     method: "DELETE",
-    credentials: "include",
   });
   if (!response.ok) {
     const error = await response.json().catch(() => ({ message: "An error occurred" }));
