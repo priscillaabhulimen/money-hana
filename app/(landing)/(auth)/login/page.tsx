@@ -8,6 +8,9 @@ import { Eye, EyeOff, Lock } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { loginUser } from "@/services/auth";
+import { useQueryClient } from "@tanstack/react-query";
+import { authKeys } from "@/hooks/useCurrentUser";
 
 const schema = z.object({
   email: z.string()
@@ -22,15 +25,26 @@ type LoginForm = z.infer<typeof schema>;
 export default function LoginPage() {
   const { register, handleSubmit, formState: { errors, isValid, isSubmitting } } = useForm<LoginForm>({
     resolver: zodResolver(schema),
-    mode: "onChange"
+    mode: "onChange",
   });
   const [showPassword, setShowPassword] = useState(false);
-
+  const [serverError, setServerError] = useState<string | null>(null);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
-  function onSubmit(data: LoginForm) {
-    console.log(data);
-    router.push('/dashboard');
+  async function onSubmit(data: LoginForm) {
+    setServerError(null);
+    try {
+      const result = await loginUser(data);
+      queryClient.setQueryData(authKeys.me, result);
+      if (!result.data.isVerified) {
+        router.push("/verify-email");
+        return;
+      }
+      router.push("/dashboard");
+    } catch (err) {
+      setServerError(err instanceof Error ? err.message : "Login failed");
+    }
   }
 
   return (
@@ -54,9 +68,9 @@ export default function LoginPage() {
 
             <label htmlFor="password" className="mt-2 field-label">Password</label>
             <div className="relative">
-              <Lock 
-                size={16} 
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" 
+              <Lock
+                size={16}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
               />
               <input
                 {...register("password")}
@@ -80,19 +94,23 @@ export default function LoginPage() {
               <Link href="#" className="text-sm text-primary">Forgot Password</Link>
             </div>
 
+            {serverError && (
+              <p className="text-red-500 text-xs mt-3 text-center">{serverError}</p>
+            )}
+
             <button
-                type="submit"
-                disabled={!isValid || isSubmitting}
-                className={`${buttonStyle} mt-10`}
-              >
-                Login
-              </button>
+              type="submit"
+              disabled={!isValid || isSubmitting}
+              className={`${buttonStyle} mt-10`}
+            >
+              {isSubmitting ? "Logging in..." : "Login"}
+            </button>
 
             <div className="mt-2.5 flex justify-center gap-1">
               <p className="text-sm py-2 text-muted-foreground">{"Don't"} have an account?</p>
-              <Link 
+              <Link
                 className="text-sm text-primary font-semibold py-2 cursor-pointer"
-                href={'/register'}
+                href="/register"
               >Register</Link>
             </div>
 

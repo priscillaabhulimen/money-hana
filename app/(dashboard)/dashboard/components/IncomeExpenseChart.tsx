@@ -14,6 +14,7 @@ import {
 } from "recharts";
 import { Transaction } from "@/types";
 import { FilterPeriod } from "../page";
+import { parseISO } from "date-fns";
 
 interface IncomeExpenseChartProps {
   transactions: Transaction[];
@@ -39,7 +40,7 @@ function getWeekNumber(date: Date): number {
 function groupByWeek(transactions: Transaction[]): ChartEntry[] {
   const now = new Date();
   const filtered = transactions.filter((t) => {
-    const d = new Date(t.date);
+    const d = parseISO(t.date);
     return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
   });
   const weeks: Record<string, { income: number; expenses: number }> = {
@@ -49,7 +50,7 @@ function groupByWeek(transactions: Transaction[]): ChartEntry[] {
     "Week 4": { income: 0, expenses: 0 },
   };
   filtered.forEach((t) => {
-    const week = `Week ${getWeekNumber(new Date(t.date))}`;
+    const week = `Week ${getWeekNumber(parseISO(t.date))}`;
     if (!weeks[week]) return;
     if (t.transaction_type === "income") weeks[week].income += t.amount;
     else weeks[week].expenses += t.amount;
@@ -70,15 +71,19 @@ function groupByDay(transactions: Transaction[]): ChartEntry[] {
   const endOfWeek = new Date(startOfWeek);
   endOfWeek.setDate(startOfWeek.getDate() + 6);
   endOfWeek.setHours(23, 59, 59, 999);
+
   const buckets: Record<string, { income: number; expenses: number }> = {};
   days.forEach((d) => (buckets[d] = { income: 0, expenses: 0 }));
+
   transactions.forEach((t) => {
-    const d = new Date(t.date);
+    // parseISO treats "2026-03-08" as local time, not UTC
+    const d = parseISO(t.date);
     if (d < startOfWeek || d > endOfWeek) return;
     const day = days[d.getDay()];
     if (t.transaction_type === "income") buckets[day].income += t.amount;
     else buckets[day].expenses += t.amount;
   });
+
   return days.map((day) => ({
     label: day,
     Income: parseFloat(buckets[day].income.toFixed(2)),
@@ -90,12 +95,12 @@ function groupByMonth(transactions: Transaction[]): ChartEntry[] {
   const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const now = new Date();
   const filtered = transactions.filter(
-    (t) => new Date(t.date).getFullYear() === now.getFullYear()
+    (t) => parseISO(t.date).getFullYear() === now.getFullYear()
   );
   const buckets: Record<string, { income: number; expenses: number }> = {};
   months.forEach((m) => (buckets[m] = { income: 0, expenses: 0 }));
   filtered.forEach((t) => {
-    const month = months[new Date(t.date).getMonth()];
+    const month = months[parseISO(t.date).getMonth()];
     if (t.transaction_type === "income") buckets[month].income += t.amount;
     else buckets[month].expenses += t.amount;
   });

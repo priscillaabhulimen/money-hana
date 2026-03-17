@@ -8,7 +8,9 @@ import {
   LogOut,
   Lightbulb,
 } from "lucide-react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Sidebar,
   SidebarContent,
@@ -21,6 +23,8 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { User } from "@/types";
+import ConfirmDialog from "@/components/ConfirmDialog";
+import { logoutUser } from "@/services/auth";
 
 interface AppSidebarProps {
   pathname: string;
@@ -31,17 +35,31 @@ const NAV_ITEMS = [
   { label: "Dashboard",    href: "/dashboard",    icon: LayoutDashboard },
   { label: "Transactions", href: "/transactions", icon: ArrowLeftRight },
   { label: "Goals",        href: "/goals",        icon: Target },
-  { label: "Insights",     href: "/insights",     icon: Lightbulb},
+  { label: "Insights",     href: "/insights",     icon: Lightbulb },
 ];
 
 function getInitials(user?: User): string {
   if (!user) return "?";
-  return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
+  const first = user.firstName?.[0] ?? "";
+  const last = user.lastName?.[0] ?? "";
+  const initials = `${first}${last}`.trim();
+  return initials ? initials.toUpperCase() : "?";
 }
 
 export default function AppSidebar({ pathname, user }: AppSidebarProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { setOpenMobile } = useSidebar();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
+  async function handleLogout() {
+    try {
+      await logoutUser();
+    } finally {
+      queryClient.clear();
+      router.push("/login");
+    }
+  }
 
   return (
     <Sidebar>
@@ -70,10 +88,7 @@ export default function AppSidebar({ pathname, user }: AppSidebarProps) {
                     }
                   `}
                 >
-                  <Link
-                    href={href}
-                    onClick={() => setOpenMobile(false)}
-                  >
+                  <Link href={href} onClick={() => setOpenMobile(false)}>
                     <Icon
                       size={18}
                       className={`transition-colors ${active ? "text-white" : "text-white/40 group-hover:text-white/70"}`}
@@ -107,10 +122,7 @@ export default function AppSidebar({ pathname, user }: AppSidebarProps) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              onClick={() => {
-                localStorage.removeItem("token");
-                router.push("/login");
-              }}
+              onClick={() => setShowLogoutConfirm(true)}
               className="text-white/50 hover:text-white hover:bg-white/5 transition-all duration-150"
             >
               <LogOut size={18} className="text-white/40 group-hover:text-white/70 transition-colors" />
@@ -119,6 +131,15 @@ export default function AppSidebar({ pathname, user }: AppSidebarProps) {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
+
+      <ConfirmDialog
+        open={showLogoutConfirm}
+        title="Log out"
+        description="Are you sure you want to log out of your account?"
+        confirmLabel="Log out"
+        onConfirm={handleLogout}
+        onCancel={() => setShowLogoutConfirm(false)}
+      />
 
     </Sidebar>
   );

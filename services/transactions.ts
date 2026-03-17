@@ -1,7 +1,7 @@
 import { Transaction, ApiResponse, PaginatedResponse } from "@/types";
+import { apiFetch } from "@/services/http";
 
 const ROWS_PER_PAGE = 30;
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
@@ -19,14 +19,14 @@ export async function getTransactions(page: number, startDate?: string, endDate?
   if (startDate) params.append("start_date", startDate);
   if (endDate) params.append("end_date", endDate);
 
-  const response = await fetch(`${API_URL}/transactions?${params}`, {
+  const response = await apiFetch(`/transactions?${params}`, {
     cache: "no-store",
   });
   return handleResponse<PaginatedResponse<Transaction[]>>(response);
 }
 
 export async function getTransaction(id: string) {
-  const response = await fetch(`${API_URL}/transactions/${id}`, {
+  const response = await apiFetch(`/transactions/${id}`, {
     cache: "no-store",
   });
   return handleResponse<ApiResponse<Transaction>>(response);
@@ -41,7 +41,7 @@ export type TransactionPayload = {
 };
 
 export async function addTransaction(data: TransactionPayload) {
-  const response = await fetch(`${API_URL}/transactions`, {
+  const response = await apiFetch("/transactions", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -50,7 +50,7 @@ export async function addTransaction(data: TransactionPayload) {
 }
 
 export async function updateTransaction(id: string, data: Partial<TransactionPayload>) {
-  const response = await fetch(`${API_URL}/transactions/${id}`, {
+  const response = await apiFetch(`/transactions/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -59,7 +59,7 @@ export async function updateTransaction(id: string, data: Partial<TransactionPay
 }
 
 export async function deleteTransaction(id: string) {
-  const response = await fetch(`${API_URL}/transactions/${id}`, {
+  const response = await apiFetch(`/transactions/${id}`, {
     method: "DELETE",
   });
   if (!response.ok) {

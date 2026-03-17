@@ -1,6 +1,5 @@
 import { Goal, ApiResponse } from "@/types";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+import { apiFetch } from "@/services/http";
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
@@ -11,12 +10,16 @@ async function handleResponse<T>(response: Response): Promise<T> {
 }
 
 export async function getGoals() {
-  const response = await fetch(`${API_URL}/goals`, { cache: "no-store" });
+  const response = await apiFetch("/goals", {
+    cache: "no-store",
+  });
   return handleResponse<ApiResponse<Goal[]>>(response);
 }
 
 export async function getGoal(id: string) {
-  const response = await fetch(`${API_URL}/goals/${id}`, { cache: "no-store" });
+  const response = await apiFetch(`/goals/${id}`, {
+    cache: "no-store",
+  });
   return handleResponse<ApiResponse<Goal>>(response);
 }
 
@@ -26,7 +29,7 @@ export type GoalPayload = {
 };
 
 export async function addGoal(data: GoalPayload) {
-  const response = await fetch(`${API_URL}/goals`, {
+  const response = await apiFetch("/goals", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -35,7 +38,7 @@ export async function addGoal(data: GoalPayload) {
 }
 
 export async function updateGoal(id: string, data: Pick<GoalPayload, "monthly_limit">) {
-  const response = await fetch(`${API_URL}/goals/${id}`, {
+  const response = await apiFetch(`/goals/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -44,7 +47,7 @@ export async function updateGoal(id: string, data: Pick<GoalPayload, "monthly_li
 }
 
 export async function deleteGoal(id: string) {
-  const response = await fetch(`${API_URL}/goals/${id}`, {
+  const response = await apiFetch(`/goals/${id}`, {
     method: "DELETE",
   });
   if (!response.ok) {

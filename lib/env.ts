@@ -1,31 +1,15 @@
-const REQUIRED_ENV_VARS = [
-  {
-    api: 'NEXT_PUBLIC_API_URL',
-  },
-] as const;
+export const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+if (!API_URL) {
+  throw new Error(
+    "Missing required environment variable: NEXT_PUBLIC_API_URL. Add it to .env or .env.local.",
+  );
+}
 
 export function validateEnv() {
-  const errors: string[] = [];
-
-  for (const { api } of REQUIRED_ENV_VARS) {
-    const val = process.env[api];
-
-    if (!val) {
-      errors.push(`Missing: ${api}`);
-      continue;
-    }
-
-  }
-
-  if (errors.length > 0) {
-    console.error('\n❌ Environment validation failed:\n');
-    errors.forEach(e => console.error(`  • ${e}`));
-    console.error('\nAdd the missing variables to your .env.local file.\n');
-
-    if (process.env.NODE_ENV === 'production') {
-      throw new Error('Invalid environment configuration.');
-    }
-  } else {
-    console.log('✅ Environment OK');
+  if (!process.env.NEXT_PUBLIC_API_URL) {
+    throw new Error(
+      "Environment validation failed. Missing: NEXT_PUBLIC_API_URL. Add it to .env or .env.local.",
+    );
   }
 }
