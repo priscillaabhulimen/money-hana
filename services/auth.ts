@@ -1,5 +1,5 @@
 import { ApiResponse, User } from "@/types";
-import { apiFetch } from "@/services/http";
+import { apiFetch, handleResponse } from "@/services/http";
 
 type ApiUser = {
   id: string;
@@ -10,12 +10,6 @@ type ApiUser = {
   user_type: string;
   created_at: string;
 };
-
-async function handleResponse<T>(res: Response): Promise<T> {
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.message ?? "Something went wrong");
-  return data;
-}
 
 function toUser(user: ApiUser): User {
   return {
