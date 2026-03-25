@@ -46,7 +46,7 @@ function getInsightConfig(type: InsightType): InsightConfig {
 }
 
 export default function AIInsightsPanel({ insights, isLoading, onRefresh }: AIInsightsPanelProps) {
-  const displayed = insights.slice(0, 3);
+  const displayed = insights.slice(0, 2);
   return (
     <Card className="flex-1 border-0 shadow-sm bg-card rounded-sm">
       <CardHeader className="pb-2">
