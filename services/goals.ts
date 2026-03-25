@@ -1,13 +1,6 @@
 import { Goal, ApiResponse } from "@/types";
-import { apiFetch } from "@/services/http";
+import { apiFetch, handleResponse } from "@/services/http";
 
-async function handleResponse<T>(response: Response): Promise<T> {
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: "An error occurred" }));
-    throw new Error(error.message || "An error occurred");
-  }
-  return response.json();
-}
 
 export async function getGoals() {
   const response = await apiFetch("/goals", {

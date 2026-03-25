@@ -1,15 +1,7 @@
 import { Transaction, ApiResponse, PaginatedResponse } from "@/types";
-import { apiFetch } from "@/services/http";
+import { apiFetch, handleResponse } from "@/services/http";
 
 const ROWS_PER_PAGE = 30;
-
-async function handleResponse<T>(response: Response): Promise<T> {
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: "An error occurred" }));
-    throw new Error(error.message || "An error occurred");
-  }
-  return response.json();
-}
 
 export async function getTransactions(page: number, startDate?: string, endDate?: string) {
   const params = new URLSearchParams({

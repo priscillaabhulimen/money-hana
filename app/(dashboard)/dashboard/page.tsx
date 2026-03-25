@@ -44,14 +44,26 @@ function filterByPeriod(transactions: Transaction[], period: FilterPeriod): Tran
 
 export default function DashboardPage() {
   const [period, setPeriod] = useState<FilterPeriod>("year");
-  const [insights, setInsights] = useState<AIInsight[]>([]);
 
   // Fetch all transactions for dashboard (no pagination — we need full data for charts)
   const { data, isLoading } = useTransactions(1, undefined, undefined);
   const transactions = useMemo(() => data?.data ?? [], [data]);
 
+  const [insights, setInsights] = useState<AIInsight[]>([]);
+  const [insightsLoading, setInsightsLoading] = useState(false);
+
+  async function loadInsights(forceRefresh = false) {
+    setInsightsLoading(true);
+    try {
+      const data = await getInsights(forceRefresh);
+      setInsights(data);
+    } finally {
+      setInsightsLoading(false);
+    }
+  }
+
   useEffect(() => {
-    getInsights().then(setInsights);
+    loadInsights();
   }, []);
 
   const balance = useMemo(() =>
@@ -119,7 +131,11 @@ export default function DashboardPage() {
         ) : (
           <RecentTransactions transactions={transactions} />
         )}
-        <AIInsightsPanel insights={insights} />
+        <AIInsightsPanel
+          insights={insights}
+          isLoading={insightsLoading}
+          onRefresh={() => loadInsights(true)}
+        />
       </div>
 
     </div>

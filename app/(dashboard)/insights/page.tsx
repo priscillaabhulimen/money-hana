@@ -6,7 +6,7 @@ import { format, parseISO } from "date-fns";
 import InsightTypeToggle from "./components/InsightTypeToggle";
 import InsightGroup from "./components/InsightGroup";
 import InsightPagination from "./components/InsightPagination";
-import { getInsights } from "@/services/insights";
+import { getInsightsHistory } from "@/services/insights";
 
 const ROWS_PER_PAGE = 10;
 
@@ -28,7 +28,7 @@ export default function InsightsPage() {
   const [page, setPage] = useState(1);
 
   useEffect(() => {
-    getInsights().then(setInsights);
+    getInsightsHistory().then(setInsights);
   }, []);
 
   const filtered = useMemo(() => {
