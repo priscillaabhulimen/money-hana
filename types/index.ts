@@ -97,3 +97,21 @@ export interface ApiResponse<T> {
   data: T;
   message?: string;
 }
+
+export interface Subscription {
+  id: string;
+  user_id: string;
+  name: string;
+  category: ExpenseCategory;
+  amount: string;
+  description: string | null;
+  billing_type: "fixed_date" | "periodic";
+  frequency: "weekly" | "monthly" | "yearly";
+  anchor_day: number | null;
+  anchor_month: number | null;
+  next_due_date: string;
+  is_trial: boolean;
+  trial_ends_at: string | null;
+  is_active: boolean;
+  created_at: string;
+}
