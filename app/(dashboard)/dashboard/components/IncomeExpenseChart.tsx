@@ -139,7 +139,7 @@ export default function IncomeExpenseChart({ transactions, period }: IncomeExpen
           Income vs. Expenses
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="my-auto">
         <ResponsiveContainer width="100%" height={260}>
           <BarChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }} barCategoryGap="30%" barGap={4}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
