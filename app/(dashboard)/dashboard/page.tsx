@@ -118,7 +118,11 @@ const [dismissingId, setDismissingId] = useState<string | null>(null);
             >
               <div>
                 <p className="text-sm font-medium text-foreground">
-                  {sub.name} was due on {sub.next_due_date}
+                  {sub.name} was due on{" "}
+                  {(() => {
+                    const [y, m, d] = sub.next_due_date.slice(0, 10).split("-").map(Number);
+                    return new Date(y, m - 1, d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+                  })()}
                 </p>
                 <p className="text-xs text-muted-foreground">
                   ${Number(sub.amount).toFixed(2)} · {getCategoryLabel(sub.category)}
