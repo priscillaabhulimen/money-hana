@@ -1,5 +1,7 @@
 'use client';
 
+import { useNotifications, useConfirmPayment, useDismissPayment } from "@/hooks/useNotifications";
+import ConfirmDialog from "@/components/ConfirmDialog";
 import { useState, useMemo, useEffect } from "react";
 import BalanceCard from "./components/BalanceCard";
 import IncomeExpenseChart from "./components/IncomeExpenseChart";
@@ -17,7 +19,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useTransactions } from "@/hooks/useTransactions";
 import { getInsights } from "@/services/insights";
 import { isWithinInterval, parseISO } from "date-fns";
-import { Transaction, AIInsight } from "@/types";
+import { Transaction, AIInsight, getCategoryLabel } from "@/types";
 
 
 export type FilterPeriod = "week" | "month" | "year";
@@ -83,6 +85,12 @@ export default function DashboardPage() {
     );
   }, [transactions, period]);
 
+  const { data: notifications } = useNotifications();
+const { mutate: confirm } = useConfirmPayment();
+const { mutate: dismiss } = useDismissPayment();
+const [confirmingId, setConfirmingId] = useState<string | null>(null);
+const [dismissingId, setDismissingId] = useState<string | null>(null);
+
   return (
     <div className="flex flex-col gap-6 px-8 py-10">
 
@@ -100,6 +108,58 @@ export default function DashboardPage() {
           </SelectContent>
         </Select>
       </div>
+
+      {notifications && notifications.length > 0 && (
+        <div className="flex flex-col gap-2">
+          {notifications.map((sub) => (
+            <div
+              key={sub.id}
+              className="flex items-center justify-between px-4 py-3 bg-amber-500/10 border border-amber-500/20 rounded-sm"
+            >
+              <div>
+                <p className="text-sm font-medium text-foreground">
+                  {sub.name} was due on {sub.next_due_date}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  ${Number(sub.amount).toFixed(2)} · {getCategoryLabel(sub.category)}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setDismissingId(sub.id)}
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Dismiss
+                </button>
+                <button
+                  onClick={() => setConfirmingId(sub.id)}
+                  className="text-xs font-semibold text-primary hover:text-primary/80 transition-colors"
+                >
+                  I paid this
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <ConfirmDialog
+        open={!!confirmingId}
+        title="Confirm payment"
+        description="This will log the payment as an expense in your transactions."
+        confirmLabel="Yes, I paid"
+        onConfirm={() => { confirm(confirmingId!); setConfirmingId(null); }}
+        onCancel={() => setConfirmingId(null)}
+      />
+
+      <ConfirmDialog
+        open={!!dismissingId}
+        title="Dismiss notification"
+        description="The due date will advance to the next cycle. No transaction will be created."
+        confirmLabel="Dismiss"
+        onConfirm={() => { dismiss(dismissingId!); setDismissingId(null); }}
+        onCancel={() => setDismissingId(null)}
+      />
 
       {isLoading ? (
         <Skeleton className="h-32 w-full rounded-sm" />

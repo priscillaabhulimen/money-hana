@@ -15,7 +15,6 @@ interface AppRoute {
 
 const routes: AppRoute[] = [
     { name: "Features",    href: ['/features'] },
-    { name: "Pricing",     href: ['/pricing'] },
     { name: "Get Started", href: ['/register', '/login'] },
 ]
 
