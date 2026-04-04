@@ -7,6 +7,7 @@ import {
   Target,
   LogOut,
   Lightbulb,
+  RefreshCcw,
 } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -34,8 +35,9 @@ interface AppSidebarProps {
 const NAV_ITEMS = [
   { label: "Dashboard",    href: "/dashboard",    icon: LayoutDashboard },
   { label: "Transactions", href: "/transactions", icon: ArrowLeftRight },
-  { label: "Goals",        href: "/goals",        icon: Target },
-  { label: "Insights",     href: "/insights",     icon: Lightbulb },
+  { label: "Goals",          href: "/goals",          icon: Target },
+  { label: "Subscriptions", href: "/subscriptions", icon: RefreshCcw },
+  { label: "Insights",      href: "/insights",      icon: Lightbulb },
 ];
 
 function getInitials(user?: User): string {
