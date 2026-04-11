@@ -1,6 +1,16 @@
 import { ApiResponse, User } from "@/types";
 import { apiFetch, handleResponse } from "@/services/http";
 
+export class ResetPasswordRequestError extends Error {
+  status: number;
+
+  constructor(status: number, message: string) {
+    super(message);
+    this.name = "ResetPasswordRequestError";
+    this.status = status;
+  }
+}
+
 type ApiUser = {
   id: string;
   first_name: string;
@@ -88,5 +98,33 @@ export async function resendVerification(email: string) {
     method: "POST",
     body: JSON.stringify({ email }),
   });
+  return handleResponse(res);
+}
+
+export async function forgotPassword(email: string) {
+  const res = await authFetch("/forgot-password", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+  return res;
+}
+
+export async function resetPassword(payload: { token: string; new_password: string }) {
+  const res = await authFetch("/reset-password", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    let message = "Something went wrong";
+    try {
+      const data = await res.json();
+      message = data?.message ?? message;
+    } catch {
+      // Ignore JSON parsing issues and keep generic message.
+    }
+    throw new ResetPasswordRequestError(res.status, message);
+  }
+
   return handleResponse(res);
 }

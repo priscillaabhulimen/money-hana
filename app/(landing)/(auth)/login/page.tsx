@@ -5,9 +5,9 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, Lock } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { loginUser } from "@/services/auth";
 import { useQueryClient } from "@tanstack/react-query";
 import { authKeys } from "@/hooks/useCurrentUser";
@@ -23,14 +23,31 @@ const schema = z.object({
 type LoginForm = z.infer<typeof schema>;
 
 export default function LoginPage() {
-  const { register, handleSubmit, formState: { errors, isValid, isSubmitting } } = useForm<LoginForm>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid, isSubmitting },
+    setValue,
+  } = useForm<LoginForm>({
     resolver: zodResolver(schema),
     mode: "onChange",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const emailFromQuery = searchParams.get("email")?.trim();
+    const emailFromLocalStorage = localStorage.getItem("passwordResetEmail")?.trim();
+    const emailToPrefill = emailFromQuery || emailFromLocalStorage;
+
+    if (emailToPrefill) {
+      setValue("email", emailToPrefill, { shouldValidate: true });
+      localStorage.removeItem("passwordResetEmail");
+    }
+  }, [searchParams, setValue]);
 
   async function onSubmit(data: LoginForm) {
     setServerError(null);
@@ -91,7 +108,7 @@ export default function LoginPage() {
             )}
 
             <div className="mt-2.5 flex justify-end">
-              <Link href="#" className="text-sm text-primary">Forgot Password</Link>
+              <Link href="/forgot-password" className="text-sm text-primary">Forgot password?</Link>
             </div>
 
             {serverError && (
