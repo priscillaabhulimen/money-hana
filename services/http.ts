@@ -1,7 +1,5 @@
-import { API_URL } from "@/lib/env";
-
 async function request(path: string, options: RequestInit = {}) {
-  return fetch(`${API_URL}${path}`, {
+  return fetch(`/api${path}`, {
     ...options,
     credentials: "include",
     headers: {

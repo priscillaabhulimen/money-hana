@@ -55,7 +55,7 @@ pnpm install
 Create a `.env.local` file in the project root:
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+API_URL=http://localhost:8000/api/v1
 ```
 
 ### 4. Start the dev server
@@ -75,10 +75,10 @@ The frontend is deployed on Netlify with automatic deploys from the `main` branc
 Set the following environment variable in Netlify → Site configuration → Environment variables:
 
 ```
-NEXT_PUBLIC_API_URL=https://your-api.onrender.com/api/v1
+API_URL=https://your-api.onrender.com/api/v1
 ```
 
-After adding or updating env vars, trigger a fresh deploy with **Clear cache and deploy site** — `NEXT_PUBLIC_*` variables are baked in at build time.
+After adding or updating env vars, trigger a fresh deploy with **Clear cache and deploy site**.
 
 ---
 
